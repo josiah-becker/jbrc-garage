@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { VehicleSchema, type Vehicle } from "../schemas/GetVehicles";
+import { VehicleSchema, type Vehicle } from "../../garage/schemas/GetVehicles";
 
 const api = import.meta.env.VITE_API_BASE;
 
