@@ -1,6 +1,6 @@
+import H1 from "@/components/H1";
+import VehicleCard from "@/features/garage/components/VehicleCard";
 import { createFileRoute } from "@tanstack/react-router";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -8,10 +8,18 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div>
-      hello
-      <Button>click me</Button>
-      <Badge>wowowow</Badge>
+    <div className="flex flex-col gap-4">
+      <H1>Welcome, Josiah</H1>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+        <VehicleCard />
+        <VehicleCard />
+        <VehicleCard />
+        <VehicleCard />
+        <VehicleCard />
+        <VehicleCard />
+        <VehicleCard />
+        <VehicleCard />
+      </div>
     </div>
   );
 }

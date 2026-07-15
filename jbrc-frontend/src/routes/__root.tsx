@@ -16,7 +16,7 @@ function RootComponent() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="p-4">
+        <header className="p-4 border-b border-border">
           <SidebarTrigger />
         </header>
         <div className="p-4 size-full">
