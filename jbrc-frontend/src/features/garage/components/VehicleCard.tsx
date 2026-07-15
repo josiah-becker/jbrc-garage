@@ -2,26 +2,27 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import type { Vehicle } from "../schemas/GetVehicles";
 
-export default function VehicleCard() {
+export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>XTS-S10</CardTitle>
-        <CardDescription>Rlaarlo &middot; 1/10</CardDescription>
+        <CardTitle>{vehicle.name}</CardTitle>
+        <CardDescription>
+          {vehicle.brand} &middot; {vehicle.scale}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <img
           className="w-full aspect-square object-cover bg-accent rounded-xl"
-          src="src/assets/thumbnails/xts-s10_thumbnail.jpeg"
+          src={`src/assets/thumbnails/${vehicle.name.toLowerCase()}_thumbnail.jpeg`}
           alt="Vehicle"
         />
       </CardContent>
-      <CardFooter></CardFooter>
     </Card>
   );
 }

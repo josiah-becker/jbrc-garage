@@ -1,0 +1,9 @@
+{
+  "folders": [
+    { "name": "jbrc-frontend", "path": "jbrc-frontend" },
+    { "name": "jbrc-api", "path": "jbrc-api" },
+  ],
+  "settings": {
+    "js/ts.tsdk.path": "jbrc-frontend/node_modules/typescript/lib",
+  },
+}
