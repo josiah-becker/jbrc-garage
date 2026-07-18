@@ -128,6 +128,22 @@ app.post("/parts/batch", async (c) => {
   return c.json(data, 201);
 });
 
+app.post("/parts/:id", async (c) => {
+  const id = c.req.param("id");
+  const supabase = getSupabase(c.env);
+  const { part_number, name, category, notes, quantity } = await c.req.json();
+
+  const { data, error } = await supabase
+    .from("parts")
+    .update({ part_number, name, category, notes, quantity })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return c.json({ error: error.message }, 500);
+  return c.json(data);
+});
+
 async function deleteParts(
   supabase: ReturnType<typeof getSupabase>,
   ids: string[],

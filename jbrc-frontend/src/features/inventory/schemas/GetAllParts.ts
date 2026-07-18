@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const PartQuantitySchema = z.object({
+  total: z.number(),
+  new: z.number(),
+  used: z.number(),
+});
+
+export type PartQuantity = z.infer<typeof PartQuantitySchema>;
+
 export const PartSchema = z.object({
   id: z.string(),
   part_number: z.string(),
@@ -8,6 +16,7 @@ export const PartSchema = z.object({
   brand: z.string().nullable(),
   notes: z.string().nullable(),
   vehicles: z.array(z.object({ id: z.string(), name: z.string() })),
+  quantity: PartQuantitySchema.nullable(),
 });
 
 export type Part = z.infer<typeof PartSchema>;

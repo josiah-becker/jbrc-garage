@@ -1,6 +1,7 @@
 import DataTable from "@/components/data-table";
 import AddPartsDialog from "@/features/inventory/components/AddPartsDialog";
 import DeletePartsDialog from "@/features/inventory/components/DeletePartsDialog";
+import PartDetailsSheet from "@/features/inventory/components/PartDetailsSheet";
 import PartsFilterSheet from "@/features/inventory/components/PartsFilterSheet";
 import PartsSearchInput from "@/features/inventory/components/PartsSearchInput";
 import {
@@ -9,9 +10,11 @@ import {
   notesColumn,
   partNumberColumn,
   partsSearchFilterFn,
+  quantityColumn,
   selectColumn,
 } from "@/features/inventory/lib/partsColumns";
 import { GetAllPartsQuery } from "@/features/inventory/queries/allPartsQuery";
+import type { Part } from "@/features/inventory/schemas/GetAllParts";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   type ColumnFiltersState,
@@ -29,6 +32,7 @@ const columns = [
   partNumberColumn,
   nameColumn,
   categoryColumn,
+  quantityColumn,
   notesColumn,
 ];
 
@@ -39,6 +43,7 @@ export default function Parts({ vehicleId }: { vehicleId: string }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [editingPart, setEditingPart] = useState<Part | null>(null);
 
   const vehicleParts = useMemo(
     () =>
@@ -113,8 +118,12 @@ export default function Parts({ vehicleId }: { vehicleId: string }) {
           No parts linked to this vehicle yet.
         </p>
       ) : (
-        <DataTable table={table} />
+        <DataTable table={table} onRowClick={setEditingPart} />
       )}
+      <PartDetailsSheet
+        part={editingPart}
+        onOpenChange={(open) => !open && setEditingPart(null)}
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 import { useMemo, useState } from "react";
 import AddPartsDialog from "../components/AddPartsDialog";
 import DeletePartsDialog from "../components/DeletePartsDialog";
+import PartDetailsSheet from "../components/PartDetailsSheet";
 import PartsFilterSheet from "../components/PartsFilterSheet";
 import PartsSearchInput from "../components/PartsSearchInput";
 import {
@@ -23,6 +24,7 @@ import {
   notesColumn,
   partNumberColumn,
   partsSearchFilterFn,
+  quantityColumn,
   selectColumn,
 } from "../lib/partsColumns";
 import { GetAllPartsQuery } from "../queries/allPartsQuery";
@@ -34,6 +36,7 @@ const columns: ColumnDef<Part>[] = [
   brandColumn,
   nameColumn,
   categoryColumn,
+  quantityColumn,
   {
     accessorKey: "vehicles",
     header: "Compatible Vehicles",
@@ -70,6 +73,7 @@ export default function Parts() {
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [globalFilter, setGlobalFilter] = useState("");
+  const [editingPart, setEditingPart] = useState<Part | null>(null);
 
   const categoryOptions = useMemo(
     () => Array.from(new Set(parts.map((part) => part.category))).sort(),
@@ -163,7 +167,11 @@ export default function Parts() {
           />
         </div>
       </div>
-      <DataTable table={table} />
+      <DataTable table={table} onRowClick={setEditingPart} />
+      <PartDetailsSheet
+        part={editingPart}
+        onOpenChange={(open) => !open && setEditingPart(null)}
+      />
     </div>
   );
 }

@@ -15,11 +15,13 @@ export const selectColumn: ColumnDef<Part> = {
     />
   ),
   cell: ({ row }) => (
-    <Checkbox
-      checked={row.getIsSelected()}
-      onCheckedChange={(checked) => row.toggleSelected(checked)}
-      aria-label="Select row"
-    />
+    <div onClick={(e) => e.stopPropagation()}>
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(checked) => row.toggleSelected(checked)}
+        aria-label="Select row"
+      />
+    </div>
   ),
   enableSorting: false,
   enableHiding: false,
@@ -66,4 +68,23 @@ export const notesColumn: ColumnDef<Part> = {
   accessorKey: "notes",
   header: "Notes",
   cell: ({ getValue }) => getValue<string | null>() ?? "N/A",
+};
+
+export const quantityColumn: ColumnDef<Part> = {
+  accessorKey: "quantity",
+  header: "Quantity",
+  cell: ({ getValue }) => {
+    const quantity = getValue<Part["quantity"]>();
+    if (!quantity) return <span className="text-muted-foreground">N/A</span>;
+    return (
+      <div className="flex flex-col">
+        <span>{quantity.total} total</span>
+        <span className="text-xs text-muted-foreground">
+          {quantity.new} new &middot; {quantity.used} used
+        </span>
+      </div>
+    );
+  },
+  sortingFn: (rowA, rowB) =>
+    (rowA.original.quantity?.total ?? 0) - (rowB.original.quantity?.total ?? 0),
 };

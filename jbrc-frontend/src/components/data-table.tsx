@@ -8,14 +8,17 @@ import {
 } from "@/components/ui/table";
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // TanStack Table's table instance is referentially stable and mutates
 // internally, which React Compiler's memoization can't track. Opt out until
 // react-table ships compiler support.
 export default function DataTable<TData>({
   table,
+  onRowClick,
 }: {
   table: TanstackTable<TData>;
+  onRowClick?: (row: TData) => void;
 }) {
   "use no memo";
   return (
@@ -72,6 +75,8 @@ export default function DataTable<TData>({
             <TableRow
               key={row.id}
               data-state={row.getIsSelected() ? "selected" : undefined}
+              onClick={onRowClick && (() => onRowClick(row.original))}
+              className={cn(onRowClick && "cursor-pointer")}
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>
