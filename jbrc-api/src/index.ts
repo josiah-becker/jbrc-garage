@@ -38,12 +38,22 @@ export default app;
 
 // Parts
 
+function withCompatibleVehicles(part: {
+  vehicle_parts: { vehicles: unknown }[];
+  [key: string]: unknown;
+}) {
+  const { vehicle_parts, ...rest } = part;
+  return { ...rest, vehicles: vehicle_parts.map((vp) => vp.vehicles) };
+}
+
 app.get("/parts", async (c) => {
   const supabase = getSupabase(c.env);
-  const { data, error } = await supabase.from("parts").select("*");
+  const { data, error } = await supabase
+    .from("parts")
+    .select("*, vehicle_parts(vehicles(id, name))");
   if (error) return c.json({ error: error.message }, 500);
 
-  return c.json(data);
+  return c.json(data.map(withCompatibleVehicles));
 });
 
 app.get("/parts/:id", async (c) => {
@@ -51,12 +61,12 @@ app.get("/parts/:id", async (c) => {
   const supabase = getSupabase(c.env);
   const { data, error } = await supabase
     .from("parts")
-    .select("*")
+    .select("*, vehicle_parts(vehicles(id, name))")
     .eq("id", id)
     .single();
 
   if (error) return c.json({ error: error.message }, 404);
-  return c.json(data);
+  return c.json(withCompatibleVehicles(data));
 });
 
 type NewPartInput = Record<string, unknown> & { vehicle_ids?: string[] };

@@ -100,6 +100,30 @@ const columns: ColumnDef<Part>[] = [
     filterFn: (row, columnId, filterValue: string[]) =>
       filterValue.length === 0 || filterValue.includes(row.getValue(columnId)),
   },
+  {
+    accessorKey: "vehicles",
+    header: "Compatible Vehicles",
+    cell: ({ getValue }) => {
+      const vehicles = getValue<Part["vehicles"]>();
+      if (vehicles.length === 0) {
+        return <span className="text-muted-foreground">N/A</span>;
+      }
+      return (
+        <div className="flex flex-wrap gap-1">
+          {vehicles.map((vehicle) => (
+            <Badge key={vehicle.id} variant="secondary">
+              {vehicle.name}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue: string[]) =>
+      filterValue.length === 0 ||
+      row
+        .getValue<Part["vehicles"]>(columnId)
+        .some((vehicle) => filterValue.includes(vehicle.name)),
+  },
 
   {
     accessorKey: "notes",
@@ -154,6 +178,7 @@ export default function Parts() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -182,16 +207,27 @@ export default function Parts() {
       ).sort(),
     [parts],
   );
+  const vehicleOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(parts.flatMap((part) => part.vehicles.map((v) => v.name))),
+      ).sort(),
+    [parts],
+  );
 
   const columnFilters: ColumnFiltersState = useMemo(
     () => [
       { id: "category", value: selectedCategories },
       { id: "brand", value: selectedBrands },
+      { id: "vehicles", value: selectedVehicles },
     ],
-    [selectedCategories, selectedBrands],
+    [selectedCategories, selectedBrands, selectedVehicles],
   );
 
-  const activeFilterCount = selectedCategories.length + selectedBrands.length;
+  const activeFilterCount =
+    selectedCategories.length +
+    selectedBrands.length +
+    selectedVehicles.length;
 
   const selectedIds = Object.entries(rowSelection)
     .filter(([, selected]) => selected)
@@ -287,12 +323,19 @@ export default function Parts() {
                   selected={selectedBrands}
                   onChange={setSelectedBrands}
                 />
+                <FilterGroup
+                  label="Compatible Vehicles"
+                  options={vehicleOptions}
+                  selected={selectedVehicles}
+                  onChange={setSelectedVehicles}
+                />
                 {activeFilterCount > 0 && (
                   <Button
                     variant="ghost"
                     onClick={() => {
                       setSelectedCategories([]);
                       setSelectedBrands([]);
+                      setSelectedVehicles([]);
                     }}
                   >
                     Clear filters

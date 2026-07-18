@@ -7,6 +7,7 @@ export const PartSchema = z.object({
   category: z.string(),
   brand: z.string().nullable(),
   notes: z.string().nullable(),
+  vehicles: z.array(z.object({ id: z.string(), name: z.string() })),
 });
 
 export type Part = z.infer<typeof PartSchema>;
