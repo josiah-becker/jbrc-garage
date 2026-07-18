@@ -20,23 +20,21 @@ import type { Part, PartQuantity } from "../schemas/GetAllParts";
 
 const emptyQuantity: PartQuantity = { total: 0, new: 0, used: 0 };
 
+function toDerivedQuantity(quantity: PartQuantity): PartQuantity {
+  return { ...quantity, total: quantity.new + quantity.used };
+}
+
 // Keyed by part.id from the parent so this remounts (and re-seeds its form
 // state from props) whenever a different part is selected.
-function PartEditForm({
-  part,
-  onSaved,
-}: {
-  part: Part;
-  onSaved: () => void;
-}) {
+function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
   const [form, setForm] = useState({
     part_number: part.part_number,
     name: part.name,
     category: part.category,
     notes: part.notes ?? "",
   });
-  const [quantity, setQuantity] = useState<PartQuantity>(
-    part.quantity ?? emptyQuantity,
+  const [quantity, setQuantity] = useState<PartQuantity>(() =>
+    toDerivedQuantity(part.quantity ?? emptyQuantity),
   );
 
   const queryClient = useQueryClient();
@@ -47,7 +45,7 @@ function PartEditForm({
         name: form.name,
         category: form.category,
         notes: form.notes || null,
-        quantity,
+        quantity: toDerivedQuantity(quantity),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: GetAllPartsQuery.queryKey });
@@ -58,6 +56,15 @@ function PartEditForm({
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     mutation.mutate();
+  }
+
+  function updateQuantity(next: Partial<Pick<PartQuantity, "new" | "used">>) {
+    setQuantity((current) =>
+      toDerivedQuantity({
+        ...current,
+        ...next,
+      }),
+    );
   }
 
   return (
@@ -79,9 +86,7 @@ function PartEditForm({
             id="edit-part-number"
             required
             value={form.part_number}
-            onChange={(e) =>
-              setForm({ ...form, part_number: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, part_number: e.target.value })}
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -104,9 +109,7 @@ function PartEditForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>Brand</Label>
-          <p className="text-sm text-muted-foreground">
-            {part.brand ?? "N/A"}
-          </p>
+          <p className="text-sm text-muted-foreground">{part.brand ?? "N/A"}</p>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="edit-notes">Notes</Label>
@@ -131,9 +134,8 @@ function PartEditForm({
                 type="number"
                 min={0}
                 value={quantity.total}
-                onChange={(e) =>
-                  setQuantity({ ...quantity, total: Number(e.target.value) })
-                }
+                readOnly
+                disabled
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -149,7 +151,7 @@ function PartEditForm({
                 min={0}
                 value={quantity.new}
                 onChange={(e) =>
-                  setQuantity({ ...quantity, new: Number(e.target.value) })
+                  updateQuantity({ new: Number(e.target.value) })
                 }
               />
             </div>
@@ -166,7 +168,7 @@ function PartEditForm({
                 min={0}
                 value={quantity.used}
                 onChange={(e) =>
-                  setQuantity({ ...quantity, used: Number(e.target.value) })
+                  updateQuantity({ used: Number(e.target.value) })
                 }
               />
             </div>

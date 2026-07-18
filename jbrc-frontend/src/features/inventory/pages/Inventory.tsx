@@ -4,7 +4,7 @@ import Parts from "./Parts";
 
 export default function Inventory() {
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <H1>Inventory</H1>
       <Tabs>
         <TabsList variant="line" className="w-full max-w-md">

@@ -18,12 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { GetAllVehiclesQuery } from "@/features/garage/queries/GetAllVehicles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -137,7 +132,10 @@ export default function AddPartsDialog({
     >
       <DialogTrigger
         render={
-          <Button>
+          <Button
+            className="fixed bottom-4 right-4 z-50 md:static md:bottom-auto md:right-auto"
+            variant="default"
+          >
             <PlusIcon />
             Add Parts
           </Button>
@@ -202,9 +200,7 @@ export default function AddPartsDialog({
                 <Input
                   id="brand"
                   value={form.brand}
-                  onChange={(e) =>
-                    setForm({ ...form, brand: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, brand: e.target.value })}
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -212,9 +208,7 @@ export default function AddPartsDialog({
                 <Textarea
                   id="notes"
                   value={form.notes}
-                  onChange={(e) =>
-                    setForm({ ...form, notes: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 />
               </div>
             </TabsContent>

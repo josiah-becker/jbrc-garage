@@ -6,9 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 // TanStack Table's table instance is referentially stable and mutates
 // internally, which React Compiler's memoization can't track. Opt out until
