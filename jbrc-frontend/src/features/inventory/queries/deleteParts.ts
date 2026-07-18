@@ -9,3 +9,13 @@ export async function deleteParts(ids: string[]) {
   if (!res.ok) throw new Error("Failed to delete parts");
   return res.json();
 }
+
+export async function unlinkVehicleParts(vehicleId: string, partIds: string[]) {
+  const res = await fetch(`${api}/vehicles/${vehicleId}/parts`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(partIds),
+  });
+  if (!res.ok) throw new Error("Failed to remove parts from vehicle");
+  return res.json();
+}

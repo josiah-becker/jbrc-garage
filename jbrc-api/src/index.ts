@@ -175,3 +175,25 @@ app.delete("/parts/:id", async (c) => {
 
   return c.json(data[0]);
 });
+
+// Vehicle parts
+
+app.delete("/vehicles/:id/parts", async (c) => {
+  const vehicleId = c.req.param("id");
+  const partIds = await c.req.json();
+
+  if (!Array.isArray(partIds) || partIds.length === 0) {
+    return c.json({ error: "Expected a non-empty array of part ids" }, 400);
+  }
+
+  const supabase = getSupabase(c.env);
+  const { data, error } = await supabase
+    .from("vehicle_parts")
+    .delete()
+    .eq("vehicle_id", vehicleId)
+    .in("part_id", partIds)
+    .select();
+
+  if (error) return c.json({ error: error.message }, 500);
+  return c.json(data);
+});

@@ -1,27 +1,44 @@
 import DataTable from "@/components/data-table";
 import AddPartsDialog from "@/features/inventory/components/AddPartsDialog";
+import DeletePartsDialog from "@/features/inventory/components/DeletePartsDialog";
+import PartsFilterSheet from "@/features/inventory/components/PartsFilterSheet";
+import PartsSearchInput from "@/features/inventory/components/PartsSearchInput";
 import {
   categoryColumn,
   nameColumn,
   notesColumn,
   partNumberColumn,
+  partsSearchFilterFn,
+  selectColumn,
 } from "@/features/inventory/lib/partsColumns";
 import { GetAllPartsQuery } from "@/features/inventory/queries/allPartsQuery";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
+  type ColumnFiltersState,
+  type RowSelectionState,
   type SortingState,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
-const columns = [partNumberColumn, nameColumn, categoryColumn, notesColumn];
+const columns = [
+  selectColumn,
+  partNumberColumn,
+  nameColumn,
+  categoryColumn,
+  notesColumn,
+];
 
 export default function Parts({ vehicleId }: { vehicleId: string }) {
   "use no memo";
   const { data: parts } = useSuspenseQuery(GetAllPartsQuery);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const vehicleParts = useMemo(
     () =>
@@ -31,20 +48,65 @@ export default function Parts({ vehicleId }: { vehicleId: string }) {
     [parts, vehicleId],
   );
 
+  const categoryOptions = useMemo(
+    () =>
+      Array.from(new Set(vehicleParts.map((part) => part.category))).sort(),
+    [vehicleParts],
+  );
+
+  const columnFilters: ColumnFiltersState = useMemo(
+    () => [{ id: "category", value: selectedCategories }],
+    [selectedCategories],
+  );
+
+  const selectedIds = Object.entries(rowSelection)
+    .filter(([, selected]) => selected)
+    .map(([id]) => id);
+
   const table = useReactTable({
     data: vehicleParts,
     columns,
-    state: { sorting },
+    state: { sorting, globalFilter, rowSelection, columnFilters },
     getRowId: (part) => part.id,
     onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    onRowSelectionChange: setRowSelection,
+    globalFilterFn: partsSearchFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <AddPartsDialog defaultVehicleId={vehicleId} />
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <PartsSearchInput
+            parts={vehicleParts}
+            value={globalFilter}
+            onValueChange={setGlobalFilter}
+          />
+          {selectedIds.length > 0 && (
+            <DeletePartsDialog
+              selectedIds={selectedIds}
+              onDeleted={() => setRowSelection({})}
+              vehicleId={vehicleId}
+            />
+          )}
+        </div>
+        <div className="flex gap-2">
+          <AddPartsDialog defaultVehicleId={vehicleId} />
+          <PartsFilterSheet
+            groups={[
+              {
+                label: "Category",
+                options: categoryOptions,
+                selected: selectedCategories,
+                onChange: setSelectedCategories,
+              },
+            ]}
+          />
+        </div>
       </div>
       {vehicleParts.length === 0 ? (
         <p className="text-sm text-muted-foreground">
