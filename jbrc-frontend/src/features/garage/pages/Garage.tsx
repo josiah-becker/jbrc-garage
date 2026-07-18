@@ -1,10 +1,10 @@
 import H1 from "@/components/H1";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import VehicleCard from "../components/VehicleCard";
 import { GetAllVehiclesQuery } from "../queries/GetAllVehicles";
 
 export default function Garage() {
-  const { data: vehicles } = useQuery(GetAllVehiclesQuery);
+  const { data: vehicles } = useSuspenseQuery(GetAllVehiclesQuery);
 
   return (
     <div className="flex flex-col gap-4">
