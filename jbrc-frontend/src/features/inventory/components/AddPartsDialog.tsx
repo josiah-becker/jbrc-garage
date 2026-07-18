@@ -43,17 +43,25 @@ const emptyForm = {
   notes: "",
 };
 
-export default function AddPartsDialog() {
+export default function AddPartsDialog({
+  defaultVehicleId,
+}: {
+  defaultVehicleId?: string;
+}) {
+  const defaultVehicleIds = defaultVehicleId ? [defaultVehicleId] : [];
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"single" | "csv">("single");
   const [form, setForm] = useState(emptyForm);
-  const [vehicleIds, setVehicleIds] = useState<string[]>([]);
+  const [vehicleIds, setVehicleIds] = useState<string[]>(defaultVehicleIds);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvError, setCsvError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
-  const { data: vehicles = [] } = useQuery(GetAllVehiclesQuery);
+  const { data: vehicles = [] } = useQuery({
+    ...GetAllVehiclesQuery,
+    enabled: !defaultVehicleId,
+  });
 
   const mutation = useMutation({
     mutationFn: createParts,
@@ -66,7 +74,7 @@ export default function AddPartsDialog() {
 
   function resetForm() {
     setForm(emptyForm);
-    setVehicleIds([]);
+    setVehicleIds(defaultVehicleIds);
     setCsvFile(null);
     setCsvError(null);
     setMode("single");
@@ -139,8 +147,9 @@ export default function AddPartsDialog() {
         <DialogHeader>
           <DialogTitle>Add Parts</DialogTitle>
           <DialogDescription>
-            Add a single part or upload a CSV, and optionally mark them as
-            compatible with vehicles in your garage.
+            {defaultVehicleId
+              ? "Add a single part or upload a CSV. New parts are marked as compatible with this vehicle."
+              : "Add a single part or upload a CSV, and optionally mark them as compatible with vehicles in your garage."}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -228,34 +237,36 @@ export default function AddPartsDialog() {
             </TabsContent>
           </Tabs>
 
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="vehicles">Compatible vehicles</Label>
-            <Select
-              multiple
-              value={vehicleIds}
-              onValueChange={(value) => setVehicleIds(value)}
-            >
-              <SelectTrigger id="vehicles" className="w-full">
-                <SelectValue placeholder="None selected">
-                  {(value: string[]) =>
-                    value.length === 0
-                      ? "None selected"
-                      : vehicles
-                          .filter((vehicle) => value.includes(vehicle.id))
-                          .map((vehicle) => vehicle.name)
-                          .join(", ")
-                  }
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {vehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!defaultVehicleId && (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="vehicles">Compatible vehicles</Label>
+              <Select
+                multiple
+                value={vehicleIds}
+                onValueChange={(value) => setVehicleIds(value)}
+              >
+                <SelectTrigger id="vehicles" className="w-full">
+                  <SelectValue placeholder="None selected">
+                    {(value: string[]) =>
+                      value.length === 0
+                        ? "None selected"
+                        : vehicles
+                            .filter((vehicle) => value.includes(vehicle.id))
+                            .map((vehicle) => vehicle.name)
+                            .join(", ")
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {vehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {(csvError || mutation.isError) && (
             <p className="text-sm text-destructive">

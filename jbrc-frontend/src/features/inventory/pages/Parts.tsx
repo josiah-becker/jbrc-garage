@@ -1,3 +1,4 @@
+import DataTable from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,14 +20,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
@@ -36,21 +29,21 @@ import {
   type ColumnFiltersState,
   type RowSelectionState,
   type SortingState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  ListFilter,
-  Trash2Icon,
-} from "lucide-react";
+import { ListFilter, Trash2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 import AddPartsDialog from "../components/AddPartsDialog";
+import {
+  brandColumn,
+  categoryColumn,
+  nameColumn,
+  notesColumn,
+  partNumberColumn,
+} from "../lib/partsColumns";
 import { GetAllPartsQuery } from "../queries/allPartsQuery";
 import { deleteParts } from "../queries/deleteParts";
 import type { Part } from "../schemas/GetAllParts";
@@ -79,27 +72,10 @@ const columns: ColumnDef<Part>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "part_number",
-    header: "Part Number",
-  },
-  {
-    accessorKey: "brand",
-    header: "Brand",
-    cell: ({ getValue }) => getValue<string | null>() ?? "N/A",
-    filterFn: (row, columnId, filterValue: string[]) =>
-      filterValue.length === 0 || filterValue.includes(row.getValue(columnId)),
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "category",
-    header: "Category",
-    filterFn: (row, columnId, filterValue: string[]) =>
-      filterValue.length === 0 || filterValue.includes(row.getValue(columnId)),
-  },
+  partNumberColumn,
+  brandColumn,
+  nameColumn,
+  categoryColumn,
   {
     accessorKey: "vehicles",
     header: "Compatible Vehicles",
@@ -124,12 +100,7 @@ const columns: ColumnDef<Part>[] = [
         .getValue<Part["vehicles"]>(columnId)
         .some((vehicle) => filterValue.includes(vehicle.name)),
   },
-
-  {
-    accessorKey: "notes",
-    header: "Notes",
-    cell: ({ getValue }) => getValue<string | null>() ?? "N/A",
-  },
+  notesColumn,
 ];
 
 function FilterGroup({
@@ -174,6 +145,7 @@ function FilterGroup({
 }
 
 export default function Parts() {
+  "use no memo";
   const { data: parts } = useSuspenseQuery(GetAllPartsQuery);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -346,59 +318,7 @@ export default function Parts() {
           </Sheet>
         </div>
       </div>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const sortDirection = header.column.getIsSorted();
-                return (
-                  <TableHead key={header.id}>
-                    {header.column.getCanSort() ? (
-                      <button
-                        type="button"
-                        className="flex items-center gap-1 select-none"
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {sortDirection === "asc" ? (
-                          <ArrowUp className="size-3.5" />
-                        ) : sortDirection === "desc" ? (
-                          <ArrowDown className="size-3.5" />
-                        ) : (
-                          <ArrowUpDown className="size-3.5 text-muted-foreground" />
-                        )}
-                      </button>
-                    ) : (
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )
-                    )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              data-state={row.getIsSelected() ? "selected" : undefined}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable table={table} />
     </div>
   );
 }

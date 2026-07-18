@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { getVehicleThumbnail } from "../../garage/lib/thumbnails";
+import Parts from "../components/Parts";
 import { GetVehicleQuery } from "../queries/GetVehicle";
 
 export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
@@ -39,7 +40,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
           <p>Details content goes here.</p>
         </TabsContent>
         <TabsContent value="parts">
-          <p>Parts content goes here.</p>
+          <Parts vehicleId={vehicleId} />
         </TabsContent>
         <TabsContent value="repairs">
           <p>Repairs content goes here.</p>
