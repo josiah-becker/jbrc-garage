@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { getSupabase, type SupabaseBindings } from "../lib/supabase";
 
-const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+const MAX_PHOTO_BYTES = 15 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const MAX_MANUAL_BYTES = 25 * 1024 * 1024;
 
@@ -80,7 +80,9 @@ vehicles.delete("/:id", async (c) => {
 
   const objects = await c.env.MEDIA_BUCKET.list({ prefix: `vehicles/${id}/` });
   if (objects.objects.length > 0) {
-    await c.env.MEDIA_BUCKET.delete(objects.objects.map((object) => object.key));
+    await c.env.MEDIA_BUCKET.delete(
+      objects.objects.map((object) => object.key),
+    );
   }
 
   return c.json(data);
@@ -110,7 +112,7 @@ vehicles.post("/:id/thumbnail", async (c) => {
   }
 
   if (file.size > MAX_PHOTO_BYTES) {
-    return c.json({ error: "Image must be 10MB or smaller" }, 400);
+    return c.json({ error: "Image must be 15MB or smaller" }, 400);
   }
 
   const object = await c.env.MEDIA_BUCKET.put(
@@ -177,7 +179,7 @@ vehicles.post("/:id/media", async (c) => {
         {
           error: isVideo
             ? `${file.name} must be 50MB or smaller`
-            : `${file.name} must be 10MB or smaller`,
+            : `${file.name} must be 15MB or smaller`,
         },
         400,
       );

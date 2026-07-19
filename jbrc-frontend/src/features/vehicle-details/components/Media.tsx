@@ -78,7 +78,7 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
           {(uploadMutation.isError || removeMutation.isError) && (
             <p className="text-sm text-destructive">
               {uploadMutation.isError
-                ? "Failed to upload media. Please try again."
+                ? `Failed to upload media. Please try again. ${(uploadMutation.error as Error).message}`
                 : "Failed to remove media. Please try again."}
             </p>
           )}

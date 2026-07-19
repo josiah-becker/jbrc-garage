@@ -8,7 +8,7 @@ export async function uploadVehicleMedia(vehicleId: string, files: File[]) {
     method: "POST",
     body: formData,
   });
-  if (!res.ok) throw new Error("Failed to upload media");
+  if (!res.ok) throw new Error("Failed to upload media" + (await res.text()));
   return res.json();
 }
 
