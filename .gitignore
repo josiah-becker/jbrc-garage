@@ -11,9 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.wrangler
+.dev.vars
 
 # Env
-.env
+.env*
 
 # TanStack Router
 src/routeTree.gen.ts

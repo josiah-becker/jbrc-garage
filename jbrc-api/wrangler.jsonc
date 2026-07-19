@@ -2,7 +2,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "jbrc-api",
   "main": "src/index.ts",
-  "compatibility_date": "2026-07-15"
+  "compatibility_date": "2026-07-15",
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:5173"
+  }
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],

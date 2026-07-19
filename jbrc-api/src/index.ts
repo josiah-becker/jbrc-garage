@@ -4,12 +4,11 @@ import { getSupabase, type SupabaseBindings } from "./lib/supabase";
 
 const app = new Hono<{ Bindings: SupabaseBindings }>();
 
-app.use(
-  "*",
+app.use("*", (c, next) =>
   cors({
-    origin: "http://localhost:5173",
+    origin: c.env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim()),
     allowHeaders: ["Content-Type", "Authorization"],
-  }),
+  })(c, next),
 );
 
 app.use("*", async (c, next) => {

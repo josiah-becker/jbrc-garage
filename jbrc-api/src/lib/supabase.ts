@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 export type SupabaseBindings = {
   SUPABASE_URL: string
   SUPABASE_SERVICE_ROLE_KEY: string
+  ALLOWED_ORIGINS: string
 }
 
 export function getSupabase(env: SupabaseBindings) {
