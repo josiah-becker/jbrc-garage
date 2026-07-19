@@ -1,4 +1,5 @@
 import H1 from "@/components/H1";
+import H2 from "@/components/H2";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
@@ -6,6 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 import DeleteVehicleDialog from "../../garage/components/DeleteVehicleDialog";
 import Media from "../components/Media";
 import Parts from "../components/Parts";
+import VehicleManual from "../components/VehicleManual";
 import { GetVehicleQuery } from "../queries/GetVehicle";
 
 export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
@@ -44,8 +46,9 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
         <TabsContent value="media" className="flex flex-col gap-3">
           <Media vehicle={vehicle} />
         </TabsContent>
-        <TabsContent value="details">
-          <p>Details content goes here.</p>
+        <TabsContent value="details" className="flex flex-col gap-3">
+          <H2>Product Manual</H2>
+          <VehicleManual vehicleId={vehicleId} />
         </TabsContent>
         <TabsContent value="parts">
           <Parts vehicleId={vehicleId} />

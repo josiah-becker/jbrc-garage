@@ -49,6 +49,10 @@ export default function VehicleMediaGallery({
   if (isError)
     return <p className="text-sm text-destructive">Failed to load media.</p>;
 
+  const galleryMedia = media.filter(
+    (item) => item.content_type !== "application/pdf",
+  );
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
@@ -87,13 +91,13 @@ export default function VehicleMediaGallery({
           </p>
         )}
       </div>
-      {media.length === 0 ? (
+      {galleryMedia.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           No media for this vehicle yet.
         </p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {media.map((item) => {
+          {galleryMedia.map((item) => {
             const url = getVehicleMediaUrl(vehicleId, item.id);
             const isRemoving =
               removeMutation.isPending && removeMutation.variables === item.id;

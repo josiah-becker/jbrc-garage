@@ -3,6 +3,7 @@ import { getSupabase, type SupabaseBindings } from "../lib/supabase";
 
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const MAX_MANUAL_BYTES = 25 * 1024 * 1024;
 
 export const vehicles = new Hono<{ Bindings: SupabaseBindings }>();
 
@@ -191,6 +192,77 @@ vehicles.post("/:id/media", async (c) => {
     await c.env.MEDIA_BUCKET.delete(
       rows.map((row) => `vehicles/${id}/media/${row.id}`),
     );
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json(data, 201);
+});
+
+vehicles.post("/:id/manual", async (c) => {
+  const id = c.req.param("id");
+  const supabase = getSupabase(c.env);
+
+  const { error: vehicleError } = await supabase
+    .from("vehicles")
+    .select("id")
+    .eq("id", id)
+    .single();
+
+  if (vehicleError) return c.json({ error: "Vehicle not found" }, 404);
+
+  const body = await c.req.parseBody();
+  const file = body.file;
+
+  if (!(file instanceof File)) {
+    return c.json({ error: "Expected a 'file' field with a PDF" }, 400);
+  }
+
+  if (file.type !== "application/pdf") {
+    return c.json({ error: "File must be a PDF" }, 400);
+  }
+
+  if (file.size > MAX_MANUAL_BYTES) {
+    return c.json({ error: "Manual must be 25MB or smaller" }, 400);
+  }
+
+  const { data: replaced, error: replacedError } = await supabase
+    .from("vehicle_media")
+    .delete()
+    .eq("vehicle_id", id)
+    .eq("content_type", "application/pdf")
+    .select("id");
+
+  if (replacedError) return c.json({ error: replacedError.message }, 500);
+
+  if (replaced.length > 0) {
+    await c.env.MEDIA_BUCKET.delete(
+      replaced.map((row) => `vehicles/${id}/media/${row.id}`),
+    );
+  }
+
+  const row = {
+    id: crypto.randomUUID(),
+    vehicle_id: id,
+    content_type: file.type,
+    size_bytes: file.size,
+    caption: file.name,
+  };
+
+  await c.env.MEDIA_BUCKET.put(`vehicles/${id}/media/${row.id}`, file, {
+    httpMetadata: {
+      contentType: file.type,
+      contentDisposition: 'inline; filename="manual.pdf"',
+    },
+  });
+
+  const { data, error } = await supabase
+    .from("vehicle_media")
+    .insert(row)
+    .select()
+    .single();
+
+  if (error) {
+    await c.env.MEDIA_BUCKET.delete(`vehicles/${id}/media/${row.id}`);
     return c.json({ error: error.message }, 500);
   }
 
