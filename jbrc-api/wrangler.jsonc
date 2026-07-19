@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-15",
   "vars": {
-    "ALLOWED_ORIGINS": "http://localhost:5173,https://jbrc-frontend.josiah-becker21.workers.dev",
+    "ALLOWED_ORIGINS": "http://localhost:5173,https://jbrc-frontend.josiah-becker21.workers.dev,https://jbrc-garage.com",
   },
   // "compatibility_flags": [
   //   "nodejs_compat"
