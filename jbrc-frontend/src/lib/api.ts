@@ -10,5 +10,7 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers);
   if (session) headers.set("Authorization", `Bearer ${session.access_token}`);
 
+  console.log("API Fetch:", `${api}${path}`, init, headers);
+
   return fetch(`${api}${path}`, { ...init, headers });
 }
