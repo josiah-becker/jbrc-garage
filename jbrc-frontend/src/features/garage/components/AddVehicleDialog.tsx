@@ -23,6 +23,7 @@ const emptyForm = {
   name: "",
   brand: "",
   scale: "",
+  purchase_date: "",
   notes: "",
 };
 
@@ -43,6 +44,7 @@ export default function AddVehicleDialog() {
         name: form.name,
         brand: form.brand,
         scale: form.scale,
+        purchase_date: form.purchase_date || null,
         notes: form.notes || null,
       });
       if (thumbnail) await uploadVehiclePhoto(vehicle.id, thumbnail);
@@ -134,6 +136,17 @@ export default function AddVehicleDialog() {
               placeholder="e.g. 1:10"
               value={form.scale}
               onChange={(e) => setForm({ ...form, scale: e.target.value })}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="vehicle-purchase-date">Purchase date</Label>
+            <Input
+              id="vehicle-purchase-date"
+              type="date"
+              value={form.purchase_date}
+              onChange={(e) =>
+                setForm({ ...form, purchase_date: e.target.value })
+              }
             />
           </div>
           <div className="flex flex-col gap-1.5">

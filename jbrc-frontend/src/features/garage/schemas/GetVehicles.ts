@@ -6,6 +6,7 @@ export const VehicleSchema = z.object({
   brand: z.string(),
   scale: z.string(),
   notes: z.string().nullable(),
+  purchase_date: z.string().nullable(),
 });
 
 export type Vehicle = z.infer<typeof VehicleSchema>;

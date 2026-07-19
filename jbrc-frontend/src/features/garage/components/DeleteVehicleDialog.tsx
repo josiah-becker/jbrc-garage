@@ -41,7 +41,7 @@ export default function DeleteVehicleDialog({
       <DialogTrigger
         render={
           <Button variant="destructive">
-            <Trash2Icon /> Delete
+            <Trash2Icon /> Delete Vehicle
           </Button>
         }
       />
@@ -49,9 +49,9 @@ export default function DeleteVehicleDialog({
         <DialogHeader>
           <DialogTitle>Delete {vehicleName}?</DialogTitle>
           <DialogDescription>
-            This will permanently remove {vehicleName} from your garage,
-            along with its thumbnail and part compatibility links. This
-            action cannot be undone.
+            This will permanently remove {vehicleName} from your garage, along
+            with its thumbnail and part compatibility links. This action cannot
+            be undone.
           </DialogDescription>
         </DialogHeader>
         {mutation.isError && (

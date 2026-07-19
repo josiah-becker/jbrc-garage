@@ -30,16 +30,32 @@ vehicles.get("/:id", async (c) => {
 
 vehicles.post("/", async (c) => {
   const supabase = getSupabase(c.env);
-  const { name, brand, scale, notes } = await c.req.json();
+  const { name, brand, scale, notes, purchase_date } = await c.req.json();
 
   const { data, error } = await supabase
     .from("vehicles")
-    .insert({ name, brand, scale, notes })
+    .insert({ name, brand, scale, notes, purchase_date })
     .select()
     .single();
 
   if (error) return c.json({ error: error.message }, 500);
   return c.json(data, 201);
+});
+
+vehicles.post("/:id", async (c) => {
+  const id = c.req.param("id");
+  const supabase = getSupabase(c.env);
+  const { name, brand, scale, notes, purchase_date } = await c.req.json();
+
+  const { data, error } = await supabase
+    .from("vehicles")
+    .update({ name, brand, scale, notes, purchase_date })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return c.json({ error: error.message }, 500);
+  return c.json(data);
 });
 
 vehicles.delete("/:id", async (c) => {

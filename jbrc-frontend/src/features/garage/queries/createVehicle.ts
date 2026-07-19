@@ -6,6 +6,7 @@ export type NewVehicle = {
   brand: string;
   scale: string;
   notes?: string | null;
+  purchase_date?: string | null;
 };
 
 export async function createVehicle(vehicle: NewVehicle): Promise<Vehicle> {

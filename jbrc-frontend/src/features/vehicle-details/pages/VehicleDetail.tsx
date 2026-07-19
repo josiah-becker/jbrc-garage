@@ -1,13 +1,13 @@
 import H1 from "@/components/H1";
-import H2 from "@/components/H2";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import DeleteVehicleDialog from "../../garage/components/DeleteVehicleDialog";
+import EditVehicleDialog from "../../garage/components/EditVehicleDialog";
+import Details from "../components/Details";
 import Media from "../components/Media";
 import Parts from "../components/Parts";
-import VehicleManual from "../components/VehicleManual";
 import { GetVehicleQuery } from "../queries/GetVehicle";
 
 export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
@@ -29,11 +29,14 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
             {vehicle.brand} &middot; {vehicle.scale}
           </p>
         </div>
-        <DeleteVehicleDialog
-          vehicleId={vehicleId}
-          vehicleName={vehicle.name}
-          onDeleted={() => navigate({ to: "/" })}
-        />
+        <div className="flex gap-2">
+          <EditVehicleDialog vehicle={vehicle} />
+          <DeleteVehicleDialog
+            vehicleId={vehicleId}
+            vehicleName={vehicle.name}
+            onDeleted={() => navigate({ to: "/" })}
+          />
+        </div>
       </div>
 
       <Tabs>
@@ -47,8 +50,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
           <Media vehicle={vehicle} />
         </TabsContent>
         <TabsContent value="details" className="flex flex-col gap-3">
-          <H2>Product Manual</H2>
-          <VehicleManual vehicleId={vehicleId} />
+          <Details vehicle={vehicle} />
         </TabsContent>
         <TabsContent value="parts">
           <Parts vehicleId={vehicleId} />
