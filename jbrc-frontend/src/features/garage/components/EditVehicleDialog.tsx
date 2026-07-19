@@ -147,7 +147,8 @@ export default function EditVehicleDialog({ vehicle }: { vehicle: Vehicle }) {
       <DialogTrigger
         render={
           <Button variant="outline">
-            <PencilIcon /> Edit Vehicle
+            <PencilIcon />{" "}
+            <span className="hidden md:inline">Edit Vehicle</span>
           </Button>
         }
       />

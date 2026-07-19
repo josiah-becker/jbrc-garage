@@ -41,7 +41,8 @@ export default function DeleteVehicleDialog({
       <DialogTrigger
         render={
           <Button variant="destructive">
-            <Trash2Icon /> Delete Vehicle
+            <Trash2Icon />{" "}
+            <span className="hidden md:inline">Delete Vehicle</span>
           </Button>
         }
       />
