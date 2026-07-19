@@ -1,7 +1,13 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetClose,
@@ -12,7 +18,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GetAllVehiclesQuery } from "@/features/garage/queries/GetAllVehicles";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import { GetAllPartsQuery } from "../queries/allPartsQuery";
 import { updatePart } from "../queries/updatePart";
@@ -36,6 +43,11 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
   const [quantity, setQuantity] = useState<PartQuantity>(() =>
     toDerivedQuantity(part.quantity ?? emptyQuantity),
   );
+  const [vehicleIds, setVehicleIds] = useState<string[]>(() =>
+    part.vehicles.map((vehicle) => vehicle.id),
+  );
+
+  const { data: vehicles = [] } = useQuery(GetAllVehiclesQuery);
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -46,6 +58,7 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
         category: form.category,
         notes: form.notes || null,
         quantity: toDerivedQuantity(quantity),
+        vehicle_ids: vehicleIds,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: GetAllPartsQuery.queryKey });
@@ -175,18 +188,32 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Compatible vehicles</Label>
-          {part.vehicles.length === 0 ? (
-            <p className="text-sm text-muted-foreground">N/A</p>
-          ) : (
-            <div className="flex flex-wrap gap-1">
-              {part.vehicles.map((vehicle) => (
-                <Badge key={vehicle.id} variant="secondary">
+          <Label htmlFor="edit-vehicles">Compatible vehicles</Label>
+          <Select
+            multiple
+            value={vehicleIds}
+            onValueChange={(value) => setVehicleIds(value)}
+          >
+            <SelectTrigger id="edit-vehicles" className="w-full">
+              <SelectValue placeholder="None selected">
+                {(value: string[]) =>
+                  value.length === 0
+                    ? "None selected"
+                    : vehicles
+                        .filter((vehicle) => value.includes(vehicle.id))
+                        .map((vehicle) => vehicle.name)
+                        .join(", ")
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {vehicles.map((vehicle) => (
+                <SelectItem key={vehicle.id} value={vehicle.id}>
                   {vehicle.name}
-                </Badge>
+                </SelectItem>
               ))}
-            </div>
-          )}
+            </SelectContent>
+          </Select>
         </div>
         {mutation.isError && (
           <p className="text-sm text-destructive">

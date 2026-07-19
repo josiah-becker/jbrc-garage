@@ -7,6 +7,7 @@ export type PartEdits = {
   category: string;
   notes: string | null;
   quantity: PartQuantity;
+  vehicle_ids: string[];
 };
 
 export async function updatePart(id: string, edits: PartEdits) {

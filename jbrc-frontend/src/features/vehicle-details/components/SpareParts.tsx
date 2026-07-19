@@ -36,7 +36,7 @@ const columns = [
   notesColumn,
 ];
 
-export default function Parts({ vehicleId }: { vehicleId: string }) {
+export default function SpareParts({ vehicleId }: { vehicleId: string }) {
   "use no memo";
   const { data: parts } = useSuspenseQuery(GetAllPartsQuery);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -54,8 +54,7 @@ export default function Parts({ vehicleId }: { vehicleId: string }) {
   );
 
   const categoryOptions = useMemo(
-    () =>
-      Array.from(new Set(vehicleParts.map((part) => part.category))).sort(),
+    () => Array.from(new Set(vehicleParts.map((part) => part.category))).sort(),
     [vehicleParts],
   );
 

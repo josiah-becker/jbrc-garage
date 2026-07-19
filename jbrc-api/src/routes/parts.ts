@@ -118,9 +118,10 @@ parts.post("/batch", async (c) => {
 parts.post("/:id", async (c) => {
   const id = c.req.param("id");
   const supabase = getSupabase(c.env);
-  const { part_number, name, category, notes, quantity } = await c.req.json();
+  const { part_number, name, category, notes, quantity, vehicle_ids } =
+    await c.req.json();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("parts")
     .update({ part_number, name, category, notes, quantity })
     .eq("id", id)
@@ -128,7 +129,37 @@ parts.post("/:id", async (c) => {
     .single();
 
   if (error) return c.json({ error: error.message }, 500);
-  return c.json(data);
+
+  if (Array.isArray(vehicle_ids)) {
+    const { error: unlinkError } = await supabase
+      .from("vehicle_parts")
+      .delete()
+      .eq("part_id", id);
+
+    if (unlinkError) return c.json({ error: unlinkError.message }, 500);
+
+    if (vehicle_ids.length > 0) {
+      const { error: linkError } = await supabase
+        .from("vehicle_parts")
+        .insert(
+          vehicle_ids.map((vehicle_id: string) => ({
+            vehicle_id,
+            part_id: id,
+          })),
+        );
+
+      if (linkError) return c.json({ error: linkError.message }, 500);
+    }
+  }
+
+  const { data, error: fetchError } = await supabase
+    .from("parts")
+    .select("*, vehicle_parts(vehicles(id, name))")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) return c.json({ error: fetchError.message }, 500);
+  return c.json(withCompatibleVehicles(data));
 });
 
 parts.delete("/batch", async (c) => {
