@@ -17,7 +17,7 @@ import { Archive, LogOut, Warehouse, Wrench } from "lucide-react";
 const items = [
   { title: "Garage", url: "/", icon: Warehouse },
   { title: "Inventory", url: "/inventory", icon: Archive },
-  { title: "Repairs", url: "/repairs", icon: Wrench },
+  { title: "Maintenance", url: "/maintenance", icon: Wrench },
 ];
 
 export function AppSidebar() {

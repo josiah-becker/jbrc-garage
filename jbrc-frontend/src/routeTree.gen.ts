@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
-import { Route as AppRepairsRouteRouteImport } from './routes/_app/repairs/route'
+import { Route as AppMaintenanceRouteRouteImport } from './routes/_app/maintenance/route'
 import { Route as AppInventoryRouteRouteImport } from './routes/_app/inventory/route'
 import { Route as AppVehiclesVehicleIdRouteImport } from './routes/_app/vehicles/$vehicleId'
 
@@ -30,9 +30,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRepairsRouteRoute = AppRepairsRouteRouteImport.update({
-  id: '/repairs',
-  path: '/repairs',
+const AppMaintenanceRouteRoute = AppMaintenanceRouteRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
   getParentRoute: () => AppRoute,
 } as any)
 const AppInventoryRouteRoute = AppInventoryRouteRouteImport.update({
@@ -50,13 +50,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
   '/inventory': typeof AppInventoryRouteRoute
-  '/repairs': typeof AppRepairsRouteRoute
+  '/maintenance': typeof AppMaintenanceRouteRoute
   '/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/inventory': typeof AppInventoryRouteRoute
-  '/repairs': typeof AppRepairsRouteRoute
+  '/maintenance': typeof AppMaintenanceRouteRoute
   '/': typeof AppIndexRoute
   '/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
 }
@@ -65,21 +65,22 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/inventory': typeof AppInventoryRouteRoute
-  '/_app/repairs': typeof AppRepairsRouteRoute
+  '/_app/maintenance': typeof AppMaintenanceRouteRoute
   '/_app/': typeof AppIndexRoute
   '/_app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/inventory' | '/repairs' | '/vehicles/$vehicleId'
+  fullPaths:
+    '/' | '/login' | '/inventory' | '/maintenance' | '/vehicles/$vehicleId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/inventory' | '/repairs' | '/' | '/vehicles/$vehicleId'
+  to: '/login' | '/inventory' | '/maintenance' | '/' | '/vehicles/$vehicleId'
   id:
     | '__root__'
     | '/_app'
     | '/login'
     | '/_app/inventory'
-    | '/_app/repairs'
+    | '/_app/maintenance'
     | '/_app/'
     | '/_app/vehicles/$vehicleId'
   fileRoutesById: FileRoutesById
@@ -112,11 +113,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/repairs': {
-      id: '/_app/repairs'
-      path: '/repairs'
-      fullPath: '/repairs'
-      preLoaderRoute: typeof AppRepairsRouteRouteImport
+    '/_app/maintenance': {
+      id: '/_app/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof AppMaintenanceRouteRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/inventory': {
@@ -138,14 +139,14 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppInventoryRouteRoute: typeof AppInventoryRouteRoute
-  AppRepairsRouteRoute: typeof AppRepairsRouteRoute
+  AppMaintenanceRouteRoute: typeof AppMaintenanceRouteRoute
   AppIndexRoute: typeof AppIndexRoute
   AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppInventoryRouteRoute: AppInventoryRouteRoute,
-  AppRepairsRouteRoute: AppRepairsRouteRoute,
+  AppMaintenanceRouteRoute: AppMaintenanceRouteRoute,
   AppIndexRoute: AppIndexRoute,
   AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
 }
