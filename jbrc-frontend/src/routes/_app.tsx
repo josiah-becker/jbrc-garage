@@ -31,7 +31,7 @@ function AppLayout() {
         <div className="p-4 size-full">
           <Suspense
             fallback={
-              <Loader2Icon className="animate-spin size-24 stroke-[0.5]" />
+              <Loader2Icon className="m-auto animate-spin size-24 stroke-[0.5]" />
             }
           >
             <Outlet />
