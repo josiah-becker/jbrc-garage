@@ -4,8 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getVehicleThumbnailUrl } from "@/lib/media";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { UploadIcon, XIcon } from "lucide-react";
 import { type ChangeEvent, useRef, useState } from "react";
+import DeleteVehicleDialog from "../../garage/components/DeleteVehicleDialog";
 import { getVehicleThumbnail } from "../../garage/lib/thumbnails";
 import Parts from "../components/Parts";
 import { GetVehicleQuery } from "../queries/GetVehicle";
@@ -15,6 +17,7 @@ import {
 } from "../queries/uploadVehiclePhoto";
 
 export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
+  const navigate = useNavigate();
   const {
     data: vehicle,
     isPending,
@@ -49,7 +52,14 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <H1>{vehicle.name}</H1>
+      <div className="flex items-center justify-between">
+        <H1>{vehicle.name}</H1>
+        <DeleteVehicleDialog
+          vehicleId={vehicleId}
+          vehicleName={vehicle.name}
+          onDeleted={() => navigate({ to: "/" })}
+        />
+      </div>
       <p className="text-muted-foreground">
         {vehicle.brand} &middot; {vehicle.scale}
       </p>

@@ -26,6 +26,45 @@ vehicles.get("/:id", async (c) => {
   return c.json(data);
 });
 
+vehicles.post("/", async (c) => {
+  const supabase = getSupabase(c.env);
+  const { name, brand, scale, notes } = await c.req.json();
+
+  const { data, error } = await supabase
+    .from("vehicles")
+    .insert({ name, brand, scale, notes })
+    .select()
+    .single();
+
+  if (error) return c.json({ error: error.message }, 500);
+  return c.json(data, 201);
+});
+
+vehicles.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  const supabase = getSupabase(c.env);
+
+  const { error: linkError } = await supabase
+    .from("vehicle_parts")
+    .delete()
+    .eq("vehicle_id", id);
+
+  if (linkError) return c.json({ error: linkError.message }, 500);
+
+  const { data, error } = await supabase
+    .from("vehicles")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return c.json({ error: "Vehicle not found" }, 404);
+
+  await c.env.MEDIA_BUCKET.delete(`vehicles/${id}/thumbnail`);
+
+  return c.json(data);
+});
+
 vehicles.post("/:id/thumbnail", async (c) => {
   const id = c.req.param("id");
   const supabase = getSupabase(c.env);
