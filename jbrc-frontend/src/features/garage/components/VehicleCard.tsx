@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getVehicleThumbnailUrl } from "@/lib/media";
 import { Link } from "@tanstack/react-router";
-import { getVehicleThumbnail } from "../lib/thumbnails";
 import type { Vehicle } from "../schemas/GetVehicles";
 
 export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
@@ -22,8 +22,8 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <CardContent>
           <img
             className="w-full aspect-square object-cover bg-accent rounded-xl"
-            src={getVehicleThumbnail(vehicle.name)}
-            alt="Vehicle"
+            src={getVehicleThumbnailUrl(vehicle.id)}
+            alt={`Thumbnail of ${vehicle.name}`}
           />
         </CardContent>
       </Card>

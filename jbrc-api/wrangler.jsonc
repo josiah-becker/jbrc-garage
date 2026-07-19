@@ -6,6 +6,13 @@
   "vars": {
     "ALLOWED_ORIGINS": "http://localhost:5173,https://jbrc-frontend.josiah-becker21.workers.dev,https://jbrc-garage.com",
   },
+  "r2_buckets": [
+    {
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "jbrc-media",
+      "remote": true
+    }
+  ],
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
@@ -16,12 +23,6 @@
   //   {
   //     "binding": "MY_KV_NAMESPACE",
   //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  //   }
-  // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
   //   }
   // ],
   // "d1_databases": [
