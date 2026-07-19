@@ -43,6 +43,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
         <TabsList variant="line" className="w-full max-w-md">
           <TabsTrigger value="media">Media</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="set-up">Set Up</TabsTrigger>
           <TabsTrigger value="spare-parts">Spare Parts</TabsTrigger>
           <TabsTrigger value="repairs">Repairs</TabsTrigger>
         </TabsList>
@@ -51,6 +52,9 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
         </TabsContent>
         <TabsContent value="details" className="flex flex-col gap-3">
           <Details vehicle={vehicle} />
+        </TabsContent>
+        <TabsContent value="set-up" className="flex flex-col gap-3">
+          <p>Set Up content goes here.</p>
         </TabsContent>
         <TabsContent value="spare-parts">
           <SpareParts vehicleId={vehicleId} />
