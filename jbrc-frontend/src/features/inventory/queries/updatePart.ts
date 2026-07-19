@@ -1,6 +1,5 @@
+import { apiFetch } from "@/lib/api";
 import type { PartQuantity } from "../schemas/GetAllParts";
-
-const api = import.meta.env.VITE_API_BASE;
 
 export type PartEdits = {
   part_number: string;
@@ -11,7 +10,7 @@ export type PartEdits = {
 };
 
 export async function updatePart(id: string, edits: PartEdits) {
-  const res = await fetch(`${api}/parts/${id}`, {
+  const res = await apiFetch(`/parts/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(edits),

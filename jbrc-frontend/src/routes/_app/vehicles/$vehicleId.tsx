@@ -1,7 +1,7 @@
 import VehicleDetail from "@/features/vehicle-details/pages/VehicleDetail";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/vehicles/$vehicleId")({
+export const Route = createFileRoute("/_app/vehicles/$vehicleId")({
   component: RouteComponent,
 });
 

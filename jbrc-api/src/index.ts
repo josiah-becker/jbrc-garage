@@ -8,8 +8,25 @@ app.use(
   "*",
   cors({
     origin: "http://localhost:5173",
+    allowHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+app.use("*", async (c, next) => {
+  const authHeader = c.req.header("Authorization");
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length)
+    : undefined;
+
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  const supabase = getSupabase(c.env);
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error || !data.user) return c.json({ error: "Unauthorized" }, 401);
+
+  await next();
+});
 
 // Vehicles
 

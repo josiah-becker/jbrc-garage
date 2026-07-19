@@ -9,104 +9,152 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RepairsRouteRouteImport } from './routes/repairs/route'
-import { Route as InventoryRouteRouteImport } from './routes/inventory/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as VehiclesVehicleIdRouteImport } from './routes/vehicles/$vehicleId'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppRepairsRouteRouteImport } from './routes/_app/repairs/route'
+import { Route as AppInventoryRouteRouteImport } from './routes/_app/inventory/route'
+import { Route as AppVehiclesVehicleIdRouteImport } from './routes/_app/vehicles/$vehicleId'
 
-const RepairsRouteRoute = RepairsRouteRouteImport.update({
-  id: '/repairs',
-  path: '/repairs',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InventoryRouteRoute = InventoryRouteRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const VehiclesVehicleIdRoute = VehiclesVehicleIdRouteImport.update({
+const AppRepairsRouteRoute = AppRepairsRouteRouteImport.update({
+  id: '/repairs',
+  path: '/repairs',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInventoryRouteRoute = AppInventoryRouteRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVehiclesVehicleIdRoute = AppVehiclesVehicleIdRouteImport.update({
   id: '/vehicles/$vehicleId',
   path: '/vehicles/$vehicleId',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/inventory': typeof InventoryRouteRoute
-  '/repairs': typeof RepairsRouteRoute
-  '/vehicles/$vehicleId': typeof VehiclesVehicleIdRoute
+  '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
+  '/inventory': typeof AppInventoryRouteRoute
+  '/repairs': typeof AppRepairsRouteRoute
+  '/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/inventory': typeof InventoryRouteRoute
-  '/repairs': typeof RepairsRouteRoute
-  '/vehicles/$vehicleId': typeof VehiclesVehicleIdRoute
+  '/login': typeof LoginRoute
+  '/inventory': typeof AppInventoryRouteRoute
+  '/repairs': typeof AppRepairsRouteRoute
+  '/': typeof AppIndexRoute
+  '/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/inventory': typeof InventoryRouteRoute
-  '/repairs': typeof RepairsRouteRoute
-  '/vehicles/$vehicleId': typeof VehiclesVehicleIdRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/inventory': typeof AppInventoryRouteRoute
+  '/_app/repairs': typeof AppRepairsRouteRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/inventory' | '/repairs' | '/vehicles/$vehicleId'
+  fullPaths: '/' | '/login' | '/inventory' | '/repairs' | '/vehicles/$vehicleId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/inventory' | '/repairs' | '/vehicles/$vehicleId'
-  id: '__root__' | '/' | '/inventory' | '/repairs' | '/vehicles/$vehicleId'
+  to: '/login' | '/inventory' | '/repairs' | '/' | '/vehicles/$vehicleId'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/_app/inventory'
+    | '/_app/repairs'
+    | '/_app/'
+    | '/_app/vehicles/$vehicleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  InventoryRouteRoute: typeof InventoryRouteRoute
-  RepairsRouteRoute: typeof RepairsRouteRoute
-  VehiclesVehicleIdRoute: typeof VehiclesVehicleIdRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/repairs': {
-      id: '/repairs'
-      path: '/repairs'
-      fullPath: '/repairs'
-      preLoaderRoute: typeof RepairsRouteRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/inventory': {
-      id: '/inventory'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof InventoryRouteRouteImport
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/vehicles/$vehicleId': {
-      id: '/vehicles/$vehicleId'
+    '/_app/repairs': {
+      id: '/_app/repairs'
+      path: '/repairs'
+      fullPath: '/repairs'
+      preLoaderRoute: typeof AppRepairsRouteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inventory': {
+      id: '/_app/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AppInventoryRouteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/vehicles/$vehicleId': {
+      id: '/_app/vehicles/$vehicleId'
       path: '/vehicles/$vehicleId'
       fullPath: '/vehicles/$vehicleId'
-      preLoaderRoute: typeof VehiclesVehicleIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppVehiclesVehicleIdRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppInventoryRouteRoute: typeof AppInventoryRouteRoute
+  AppRepairsRouteRoute: typeof AppRepairsRouteRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppInventoryRouteRoute: AppInventoryRouteRoute,
+  AppRepairsRouteRoute: AppRepairsRouteRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  InventoryRouteRoute: InventoryRouteRoute,
-  RepairsRouteRoute: RepairsRouteRoute,
-  VehiclesVehicleIdRoute: VehiclesVehicleIdRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,7 +1,7 @@
-const api = import.meta.env.VITE_API_BASE;
+import { apiFetch } from "@/lib/api";
 
 export async function deleteParts(ids: string[]) {
-  const res = await fetch(`${api}/parts/batch`, {
+  const res = await apiFetch("/parts/batch", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(ids),
@@ -11,7 +11,7 @@ export async function deleteParts(ids: string[]) {
 }
 
 export async function unlinkVehicleParts(vehicleId: string, partIds: string[]) {
-  const res = await fetch(`${api}/vehicles/${vehicleId}/parts`, {
+  const res = await apiFetch(`/vehicles/${vehicleId}/parts`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(partIds),

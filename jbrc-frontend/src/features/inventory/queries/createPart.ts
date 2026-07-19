@@ -1,4 +1,4 @@
-const api = import.meta.env.VITE_API_BASE;
+import { apiFetch } from "@/lib/api";
 
 export type NewPart = {
   part_number: string;
@@ -10,7 +10,7 @@ export type NewPart = {
 };
 
 export async function createParts(parts: NewPart[]) {
-  const res = await fetch(`${api}/parts/batch`, {
+  const res = await apiFetch("/parts/batch", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parts),
