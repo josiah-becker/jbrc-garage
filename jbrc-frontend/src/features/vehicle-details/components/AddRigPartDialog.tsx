@@ -1,6 +1,4 @@
-import H3 from "@/components/H3";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -13,22 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Vehicles } from "@/features/garage/schemas/GetVehicles";
 import { GetAllPartsQuery } from "@/features/inventory/queries/allPartsQuery";
 import { createParts } from "@/features/inventory/queries/createPart";
-import type { Part } from "@/features/inventory/schemas/GetAllParts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PlusIcon, XIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { type FormEvent, useState } from "react";
-import { installPart } from "../queries/installPart";
 
 const emptyForm = {
   part_number: "",
@@ -37,9 +25,9 @@ const emptyForm = {
   notes: "",
 };
 
-// Creates a part in the slot's category and installs it on the vehicle in
+// Creates a part in the given category and installs it on the vehicle in
 // one step.
-function AddRigPartDialog({
+export default function AddRigPartDialog({
   category,
   vehicleId,
 }: {
@@ -167,120 +155,5 @@ function AddRigPartDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-export default function RigSlotCard({
-  title,
-  category,
-  description,
-  vehicleId,
-  parts,
-  vehicles,
-}: {
-  title: string;
-  category: string;
-  description: string;
-  vehicleId: string;
-  parts: Part[];
-  vehicles: Vehicles;
-}) {
-  const [selected, setSelected] = useState<string | null>(null);
-
-  const installed = parts.find(
-    (part) =>
-      part.category === category && part.installed_vehicle_id === vehicleId,
-  );
-  const candidates = parts.filter(
-    (part) =>
-      part.category === category && part.installed_vehicle_id !== vehicleId,
-  );
-
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: ({
-      partId,
-      target,
-    }: {
-      partId: string;
-      target: string | null;
-    }) => installPart(partId, target),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: GetAllPartsQuery.queryKey });
-      setSelected(null);
-    },
-  });
-
-  return (
-    <Card>
-      <CardHeader>
-        <H3>{title}</H3>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
-        {installed ? (
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex flex-col">
-              <p>{installed.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {installed.part_number}
-              </p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Remove ${installed.name}`}
-              disabled={mutation.isPending}
-              onClick={() =>
-                mutation.mutate({ partId: installed.id, target: null })
-              }
-            >
-              <XIcon />
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            {candidates.length > 0 ? (
-              <Select
-                value={selected}
-                disabled={mutation.isPending}
-                onValueChange={(partId) => {
-                  setSelected(partId);
-                  if (partId) mutation.mutate({ partId, target: vehicleId });
-                }}
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Select a part" />
-                </SelectTrigger>
-                <SelectContent>
-                  {candidates.map((part) => {
-                    const installedVehicle = vehicles.find(
-                      (vehicle) => vehicle.id === part.installed_vehicle_id,
-                    );
-                    return (
-                      <SelectItem key={part.id} value={part.id}>
-                        {part.name}
-                        {installedVehicle && ` (on ${installedVehicle.name})`}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            ) : (
-              <p className="flex-1 text-sm text-muted-foreground">
-                No {title} parts in your inventory yet.
-              </p>
-            )}
-            <AddRigPartDialog category={category} vehicleId={vehicleId} />
-          </div>
-        )}
-        {mutation.isError && (
-          <p className="text-sm text-destructive">
-            Failed to update. Please try again.
-          </p>
-        )}
-      </CardContent>
-    </Card>
   );
 }
