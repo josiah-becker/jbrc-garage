@@ -15,9 +15,11 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { GetAllVehiclesQuery } from "@/features/garage/queries/GetAllVehicles";
@@ -25,17 +27,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon, UploadIcon } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
 import { parseCsv } from "../lib/parseCsv";
+import { DefaultPartsCategory } from "../lib/partsCategories";
 import { GetAllPartsQuery } from "../queries/allPartsQuery";
 import { createParts, type NewPart } from "../queries/createPart";
 
 const REQUIRED_CSV_COLUMNS = ["part_number", "name", "category"];
 
+// Sentinel dropdown value that swaps the category select to a free-text input.
+const CUSTOM_CATEGORY = "__custom__";
+
 const emptyForm = {
   part_number: "",
   name: "",
   category: "",
+  custom_category: "",
   brand: "",
   notes: "",
+  consumable: false,
 };
 
 export default function AddPartsDialog({
@@ -57,6 +65,17 @@ export default function AddPartsDialog({
     ...GetAllVehiclesQuery,
     enabled: !defaultVehicleId,
   });
+  const { data: parts = [] } = useQuery(GetAllPartsQuery);
+
+  const customCategories = Array.from(
+    new Set(parts.map((part) => part.category)),
+  )
+    .filter(
+      (category) =>
+        !(DefaultPartsCategory as readonly string[]).includes(category),
+    )
+    .sort();
+  const categories = [...DefaultPartsCategory, ...customCategories];
 
   const mutation = useMutation({
     mutationFn: createParts,
@@ -86,9 +105,13 @@ export default function AddPartsDialog({
         {
           part_number: form.part_number,
           name: form.name,
-          category: form.category,
+          category:
+            form.category === CUSTOM_CATEGORY
+              ? form.custom_category.trim()
+              : form.category,
           brand: form.brand || null,
           notes: form.notes || null,
+          consumable: form.consumable,
           vehicle_ids: vehicleIds,
         },
       ]);
@@ -186,14 +209,39 @@ export default function AddPartsDialog({
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
+                <Select
                   required
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm({ ...form, category: e.target.value })
+                  value={form.category || null}
+                  onValueChange={(value) =>
+                    setForm({ ...form, category: value ?? "" })
                   }
-                />
+                >
+                  <SelectTrigger id="category" className="w-full">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                    <SelectSeparator />
+                    <SelectItem value={CUSTOM_CATEGORY}>Custom…</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.category === CUSTOM_CATEGORY && (
+                  <Input
+                    id="custom-category"
+                    required
+                    autoFocus
+                    placeholder="Enter a category"
+                    aria-label="Custom category"
+                    value={form.custom_category}
+                    onChange={(e) =>
+                      setForm({ ...form, custom_category: e.target.value })
+                    }
+                  />
+                )}
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="brand">Brand</Label>
@@ -209,6 +257,21 @@ export default function AddPartsDialog({
                   id="notes"
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-0.5">
+                  <Label htmlFor="consumable">Consumable</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Gets used up over time and can't be installed on a vehicle.
+                  </p>
+                </div>
+                <Switch
+                  id="consumable"
+                  checked={form.consumable}
+                  onCheckedChange={(checked) =>
+                    setForm({ ...form, consumable: checked })
+                  }
                 />
               </div>
             </TabsContent>

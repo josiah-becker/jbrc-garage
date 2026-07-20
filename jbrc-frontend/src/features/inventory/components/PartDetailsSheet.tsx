@@ -38,6 +38,7 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
     part_number: part.part_number,
     name: part.name,
     category: part.category,
+    brand: part.brand ?? "",
     notes: part.notes ?? "",
   });
   const [quantity, setQuantity] = useState<PartQuantity>(() =>
@@ -56,6 +57,7 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
         part_number: form.part_number,
         name: form.name,
         category: form.category,
+        brand: form.brand || null,
         notes: form.notes || null,
         quantity: toDerivedQuantity(quantity),
         vehicle_ids: vehicleIds,
@@ -121,8 +123,12 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Brand</Label>
-          <p className="text-sm text-muted-foreground">{part.brand ?? "N/A"}</p>
+          <Label htmlFor="edit-brand">Brand</Label>
+          <Input
+            id="edit-brand"
+            value={form.brand}
+            onChange={(e) => setForm({ ...form, brand: e.target.value })}
+          />
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="edit-notes">Notes</Label>

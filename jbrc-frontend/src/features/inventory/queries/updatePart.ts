@@ -5,6 +5,7 @@ export type PartEdits = {
   part_number: string;
   name: string;
   category: string;
+  brand: string | null;
   notes: string | null;
   quantity: PartQuantity;
   vehicle_ids: string[];
