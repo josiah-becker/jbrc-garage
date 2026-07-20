@@ -61,7 +61,7 @@ export default function RigSlotPicker({
           return (
             <div
               key={part.id}
-              className="flex items-center justify-between gap-2"
+              className="flex items-center justify-between gap-2 hover:bg-muted px-2 py-1 rounded-md transition-colors"
             >
               <div className="flex flex-col">
                 <p>{part.name}</p>

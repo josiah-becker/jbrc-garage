@@ -123,7 +123,10 @@ export default function AddRigPartDialog({
     >
       <DialogTrigger
         render={
-          <Button variant="secondary">
+          <Button
+            variant="ghost"
+            className="text-primary dark:hover:text-primary dark:hover:bg-primary/10"
+          >
             <PlusIcon />
             Install new {category}
           </Button>
@@ -134,8 +137,7 @@ export default function AddRigPartDialog({
           <DialogTitle>Install {category}</DialogTitle>
           <DialogDescription>
             Choose an existing part from your inventory, or create a new one.
-            New parts are added to your inventory and installed on this
-            vehicle.
+            New parts are added to your inventory and installed on this vehicle.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -169,13 +171,13 @@ export default function AddRigPartDialog({
                     <SelectContent>
                       {candidates.map((part) => {
                         const installedVehicle = vehicles.find(
-                          (vehicle) =>
-                            vehicle.id === part.installed_vehicle_id,
+                          (vehicle) => vehicle.id === part.installed_vehicle_id,
                         );
                         return (
                           <SelectItem key={part.id} value={part.id}>
                             {part.name}
-                            {installedVehicle && ` (on ${installedVehicle.name})`}
+                            {installedVehicle &&
+                              ` (on ${installedVehicle.name})`}
                           </SelectItem>
                         );
                       })}
@@ -184,8 +186,8 @@ export default function AddRigPartDialog({
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  No spare {category} parts in your inventory. Create a new
-                  one instead.
+                  No spare {category} parts in your inventory. Create a new one
+                  instead.
                 </p>
               )}
             </TabsContent>
