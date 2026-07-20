@@ -2,7 +2,6 @@ import H3 from "@/components/H3";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { Vehicles } from "@/features/garage/schemas/GetVehicles";
 import type { Part } from "@/features/inventory/schemas/GetAllParts";
-import InstalledRigPart from "./InstalledRigPart";
 import RigSlotPicker from "./RigSlotPicker";
 
 const CATEGORY = "ESC";
@@ -32,16 +31,13 @@ export default function EscCard({
         </p>
       </CardHeader>
       <CardContent>
-        {installed ? (
-          <InstalledRigPart part={installed} />
-        ) : (
-          <RigSlotPicker
-            category={CATEGORY}
-            vehicleId={vehicleId}
-            parts={parts}
-            vehicles={vehicles}
-          />
-        )}
+        <RigSlotPicker
+          category={CATEGORY}
+          vehicleId={vehicleId}
+          parts={parts}
+          vehicles={vehicles}
+          installedPart={installed}
+        />
       </CardContent>
     </Card>
   );

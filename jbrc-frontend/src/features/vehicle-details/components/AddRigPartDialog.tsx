@@ -81,8 +81,8 @@ export default function AddRigPartDialog({
     >
       <DialogTrigger
         render={
-          <Button>
-            <PlusIcon /> Add new
+          <Button variant="secondary" size="icon-sm">
+            <PlusIcon />
           </Button>
         }
       />

@@ -3,7 +3,6 @@ import H4 from "@/components/H4";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { Vehicles } from "@/features/garage/schemas/GetVehicles";
 import type { Part } from "@/features/inventory/schemas/GetAllParts";
-import InstalledRigPart from "./InstalledRigPart";
 import RigSlotPicker from "./RigSlotPicker";
 
 const CATEGORY_MOTOR = "Motor";
@@ -48,38 +47,29 @@ export default function MotorCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <H4>Motor</H4>
-        {installedMotor ? (
-          <InstalledRigPart part={installedMotor} />
-        ) : (
-          <RigSlotPicker
-            category={CATEGORY_MOTOR}
-            vehicleId={vehicleId}
-            parts={parts}
-            vehicles={vehicles}
-          />
-        )}
+        <RigSlotPicker
+          category={CATEGORY_MOTOR}
+          vehicleId={vehicleId}
+          parts={parts}
+          vehicles={vehicles}
+          installedPart={installedMotor}
+        />
         <H4>Pinion</H4>
-        {installedPinion ? (
-          <InstalledRigPart part={installedPinion} />
-        ) : (
-          <RigSlotPicker
-            category={CATEGORY_PINION}
-            vehicleId={vehicleId}
-            parts={parts}
-            vehicles={vehicles}
-          />
-        )}
+        <RigSlotPicker
+          category={CATEGORY_PINION}
+          vehicleId={vehicleId}
+          parts={parts}
+          vehicles={vehicles}
+          installedPart={installedPinion}
+        />
         <H4>Spur</H4>
-        {installedSpur ? (
-          <InstalledRigPart part={installedSpur} />
-        ) : (
-          <RigSlotPicker
-            category={CATEGORY_SPUR}
-            vehicleId={vehicleId}
-            parts={parts}
-            vehicles={vehicles}
-          />
-        )}
+        <RigSlotPicker
+          category={CATEGORY_SPUR}
+          vehicleId={vehicleId}
+          parts={parts}
+          vehicles={vehicles}
+          installedPart={installedSpur}
+        />
       </CardContent>
     </Card>
   );
