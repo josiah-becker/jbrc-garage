@@ -20,7 +20,7 @@ import PartsSearchInput from "../components/PartsSearchInput";
 import {
   brandColumn,
   categoryColumn,
-  nameColumn,
+  nameColumnWithInstalledVehicle,
   notesColumn,
   partNumberColumn,
   partsSearchFilterFn,
@@ -34,7 +34,7 @@ const columns: ColumnDef<Part>[] = [
   selectColumn,
   partNumberColumn,
   brandColumn,
-  nameColumn,
+  nameColumnWithInstalledVehicle,
   categoryColumn,
   quantityColumn,
   {

@@ -17,6 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { GetAllVehiclesQuery } from "@/features/garage/queries/GetAllVehicles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -40,6 +41,7 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
     category: part.category,
     brand: part.brand ?? "",
     notes: part.notes ?? "",
+    consumable: part.consumable,
   });
   const [quantity, setQuantity] = useState<PartQuantity>(() =>
     toDerivedQuantity(part.quantity ?? emptyQuantity),
@@ -49,6 +51,9 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
   );
 
   const { data: vehicles = [] } = useQuery(GetAllVehiclesQuery);
+  const installedVehicle = part.vehicles.find(
+    (vehicle) => vehicle.id === part.installed_vehicle_id,
+  );
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -59,7 +64,8 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
         category: form.category,
         brand: form.brand || null,
         notes: form.notes || null,
-        quantity: toDerivedQuantity(quantity),
+        quantity: form.consumable ? toDerivedQuantity(quantity) : null,
+        consumable: form.consumable,
         vehicle_ids: vehicleIds,
       }),
     onSuccess: () => {
@@ -138,61 +144,84 @@ function PartEditForm({ part, onSaved }: { part: Part; onSaved: () => void }) {
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Quantity</Label>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="flex flex-col gap-1">
-              <Label
-                htmlFor="edit-qty-total"
-                className="text-xs font-normal text-muted-foreground"
-              >
-                Total
-              </Label>
-              <Input
-                id="edit-qty-total"
-                type="number"
-                min={0}
-                value={quantity.total}
-                readOnly
-                disabled
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label
-                htmlFor="edit-qty-new"
-                className="text-xs font-normal text-muted-foreground"
-              >
-                New
-              </Label>
-              <Input
-                id="edit-qty-new"
-                type="number"
-                min={0}
-                value={quantity.new}
-                onChange={(e) =>
-                  updateQuantity({ new: Number(e.target.value) })
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label
-                htmlFor="edit-qty-used"
-                className="text-xs font-normal text-muted-foreground"
-              >
-                Used
-              </Label>
-              <Input
-                id="edit-qty-used"
-                type="number"
-                min={0}
-                value={quantity.used}
-                onChange={(e) =>
-                  updateQuantity({ used: Number(e.target.value) })
-                }
-              />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-0.5">
+            <Label htmlFor="edit-consumable">Consumable</Label>
+            <p className="text-xs text-muted-foreground">
+              Gets used up over time and can't be installed on a vehicle.
+            </p>
+          </div>
+          <Switch
+            id="edit-consumable"
+            checked={form.consumable}
+            onCheckedChange={(checked) =>
+              setForm({ ...form, consumable: checked })
+            }
+          />
+        </div>
+        {form.consumable && installedVehicle && (
+          <p className="text-xs text-amber-600 dark:text-amber-500">
+            This part is installed on {installedVehicle.name} and will be
+            uninstalled when you save.
+          </p>
+        )}
+        {form.consumable && (
+          <div className="flex flex-col gap-1.5">
+            <Label>Quantity</Label>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="flex flex-col gap-1">
+                <Label
+                  htmlFor="edit-qty-total"
+                  className="text-xs font-normal text-muted-foreground"
+                >
+                  Total
+                </Label>
+                <Input
+                  id="edit-qty-total"
+                  type="number"
+                  min={0}
+                  value={quantity.total}
+                  readOnly
+                  disabled
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label
+                  htmlFor="edit-qty-new"
+                  className="text-xs font-normal text-muted-foreground"
+                >
+                  New
+                </Label>
+                <Input
+                  id="edit-qty-new"
+                  type="number"
+                  min={0}
+                  value={quantity.new}
+                  onChange={(e) =>
+                    updateQuantity({ new: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label
+                  htmlFor="edit-qty-used"
+                  className="text-xs font-normal text-muted-foreground"
+                >
+                  Used
+                </Label>
+                <Input
+                  id="edit-qty-used"
+                  type="number"
+                  min={0}
+                  value={quantity.used}
+                  onChange={(e) =>
+                    updateQuantity({ used: Number(e.target.value) })
+                  }
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="edit-vehicles">Compatible vehicles</Label>
           <Select

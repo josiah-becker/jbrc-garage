@@ -6,8 +6,9 @@ import PartDetailsSheet from "@/features/inventory/components/PartDetailsSheet";
 import PartsFilterSheet from "@/features/inventory/components/PartsFilterSheet";
 import PartsSearchInput from "@/features/inventory/components/PartsSearchInput";
 import {
+  INSTALLED_FILTER_OPTIONS,
   categoryColumn,
-  nameColumn,
+  nameColumnForVehicle,
   notesColumn,
   partNumberColumn,
   partsSearchFilterFn,
@@ -28,22 +29,25 @@ import {
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
-const columns = [
-  selectColumn,
-  partNumberColumn,
-  nameColumn,
-  categoryColumn,
-  quantityColumn,
-  notesColumn,
-];
-
 export default function SpareParts({ vehicleId }: { vehicleId: string }) {
   "use no memo";
   const { data: parts } = useSuspenseQuery(GetAllPartsQuery);
+  const columns = useMemo(
+    () => [
+      selectColumn,
+      partNumberColumn,
+      nameColumnForVehicle(vehicleId),
+      categoryColumn,
+      quantityColumn,
+      notesColumn,
+    ],
+    [vehicleId],
+  );
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedInstalled, setSelectedInstalled] = useState<string[]>([]);
   const [editingPart, setEditingPart] = useState<Part | null>(null);
 
   const vehicleParts = useMemo(
@@ -60,8 +64,11 @@ export default function SpareParts({ vehicleId }: { vehicleId: string }) {
   );
 
   const columnFilters: ColumnFiltersState = useMemo(
-    () => [{ id: "category", value: selectedCategories }],
-    [selectedCategories],
+    () => [
+      { id: "category", value: selectedCategories },
+      { id: "name", value: selectedInstalled },
+    ],
+    [selectedCategories, selectedInstalled],
   );
 
   const selectedIds = Object.entries(rowSelection)
@@ -109,6 +116,12 @@ export default function SpareParts({ vehicleId }: { vehicleId: string }) {
                 options: categoryOptions,
                 selected: selectedCategories,
                 onChange: setSelectedCategories,
+              },
+              {
+                label: "Installed",
+                options: INSTALLED_FILTER_OPTIONS,
+                selected: selectedInstalled,
+                onChange: setSelectedInstalled,
               },
             ]}
           />

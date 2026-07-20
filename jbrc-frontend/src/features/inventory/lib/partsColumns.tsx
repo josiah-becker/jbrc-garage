@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { Part } from "../schemas/GetAllParts";
@@ -56,6 +57,51 @@ export const nameColumn: ColumnDef<Part> = {
   accessorKey: "name",
   header: "Name",
 };
+
+export const INSTALLED_FILTER_OPTIONS = ["Installed", "Not installed"];
+
+const installedBadgeClass =
+  "bg-green-600/10 text-green-700 dark:bg-green-500/15 dark:text-green-400";
+
+// Name column that badges parts with the name of the vehicle they're
+// installed on.
+export const nameColumnWithInstalledVehicle: ColumnDef<Part> = {
+  ...nameColumn,
+  cell: ({ row }) => {
+    const installedVehicle = row.original.vehicles.find(
+      (vehicle) => vehicle.id === row.original.installed_vehicle_id,
+    );
+    return (
+      <div className="flex items-center gap-2">
+        <span>{row.original.name}</span>
+        {installedVehicle && (
+          <Badge className={installedBadgeClass}>{installedVehicle.name}</Badge>
+        )}
+      </div>
+    );
+  },
+};
+
+// Name column that badges parts currently installed on the given vehicle,
+// filterable by installed status via INSTALLED_FILTER_OPTIONS.
+export function nameColumnForVehicle(vehicleId: string): ColumnDef<Part> {
+  return {
+    ...nameColumn,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <span>{row.original.name}</span>
+        {row.original.installed_vehicle_id === vehicleId && (
+          <Badge className={installedBadgeClass}>Installed</Badge>
+        )}
+      </div>
+    ),
+    filterFn: (row, _columnId, filterValue: string[]) => {
+      if (filterValue.length === 0) return true;
+      const installed = row.original.installed_vehicle_id === vehicleId;
+      return filterValue.includes(installed ? "Installed" : "Not installed");
+    },
+  };
+}
 
 export const categoryColumn: ColumnDef<Part> = {
   accessorKey: "category",
