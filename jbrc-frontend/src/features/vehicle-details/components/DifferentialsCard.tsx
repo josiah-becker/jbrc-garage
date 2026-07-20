@@ -15,11 +15,6 @@ export default function DifferentialsCard({
   parts: Part[];
   vehicles: Vehicles;
 }) {
-  const installed = parts.filter(
-    (part) =>
-      part.category === CATEGORY && part.installed_vehicle_id === vehicleId,
-  );
-
   return (
     <Card>
       <CardHeader>
@@ -30,16 +25,6 @@ export default function DifferentialsCard({
         </p>
       </CardHeader>
       <CardContent>
-        {installed.map((part) => (
-          <RigSlotPicker
-            key={part.id}
-            category={CATEGORY}
-            vehicleId={vehicleId}
-            parts={parts}
-            vehicles={vehicles}
-            installedPart={part}
-          />
-        ))}
         <RigSlotPicker
           category={CATEGORY}
           vehicleId={vehicleId}

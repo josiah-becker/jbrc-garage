@@ -15,11 +15,6 @@ export default function ReceiverCard({
   parts: Part[];
   vehicles: Vehicles;
 }) {
-  const installed = parts.find(
-    (part) =>
-      part.category === CATEGORY && part.installed_vehicle_id === vehicleId,
-  );
-
   return (
     <Card>
       <CardHeader>
@@ -35,7 +30,6 @@ export default function ReceiverCard({
           vehicleId={vehicleId}
           parts={parts}
           vehicles={vehicles}
-          installedPart={installed}
         />
       </CardContent>
     </Card>

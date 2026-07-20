@@ -15,11 +15,6 @@ export default function EscCard({
   parts: Part[];
   vehicles: Vehicles;
 }) {
-  const installed = parts.find(
-    (part) =>
-      part.category === CATEGORY && part.installed_vehicle_id === vehicleId,
-  );
-
   return (
     <Card>
       <CardHeader>
@@ -36,7 +31,6 @@ export default function EscCard({
           vehicleId={vehicleId}
           parts={parts}
           vehicles={vehicles}
-          installedPart={installed}
         />
       </CardContent>
     </Card>

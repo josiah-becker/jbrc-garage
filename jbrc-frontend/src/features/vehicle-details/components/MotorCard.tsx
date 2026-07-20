@@ -18,24 +18,6 @@ export default function MotorCard({
   parts: Part[];
   vehicles: Vehicles;
 }) {
-  const installedMotor = parts.find(
-    (part) =>
-      part.category === CATEGORY_MOTOR &&
-      part.installed_vehicle_id === vehicleId,
-  );
-
-  const installedPinion = parts.find(
-    (part) =>
-      part.category === CATEGORY_PINION &&
-      part.installed_vehicle_id === vehicleId,
-  );
-
-  const installedSpur = parts.find(
-    (part) =>
-      part.category === CATEGORY_SPUR &&
-      part.installed_vehicle_id === vehicleId,
-  );
-
   return (
     <Card>
       <CardHeader>
@@ -52,7 +34,6 @@ export default function MotorCard({
           vehicleId={vehicleId}
           parts={parts}
           vehicles={vehicles}
-          installedPart={installedMotor}
         />
         <H4>Pinion</H4>
         <RigSlotPicker
@@ -60,7 +41,6 @@ export default function MotorCard({
           vehicleId={vehicleId}
           parts={parts}
           vehicles={vehicles}
-          installedPart={installedPinion}
         />
         <H4>Spur</H4>
         <RigSlotPicker
@@ -68,7 +48,6 @@ export default function MotorCard({
           vehicleId={vehicleId}
           parts={parts}
           vehicles={vehicles}
-          installedPart={installedSpur}
         />
       </CardContent>
     </Card>
