@@ -7,6 +7,7 @@ import DeleteVehicleDialog from "../../garage/components/DeleteVehicleDialog";
 import EditVehicleDialog from "../../garage/components/EditVehicleDialog";
 import Details from "../components/Details";
 import Media from "../components/Media";
+import MyRig from "../components/MyRig";
 import SpareParts from "../components/SpareParts";
 import { GetVehicleQuery } from "../queries/GetVehicle";
 
@@ -43,7 +44,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
         <TabsList variant="line" className="w-full max-w-md">
           <TabsTrigger value="media">Media</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="set-up">Set Up</TabsTrigger>
+          <TabsTrigger value="my-rig">My Rig</TabsTrigger>
           <TabsTrigger value="spare-parts">Spare Parts</TabsTrigger>
           <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
         </TabsList>
@@ -53,8 +54,8 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
         <TabsContent value="details" className="flex flex-col gap-3">
           <Details vehicle={vehicle} />
         </TabsContent>
-        <TabsContent value="set-up" className="flex flex-col gap-3">
-          <p>Set Up content goes here.</p>
+        <TabsContent value="my-rig" className="flex flex-col gap-3">
+          <MyRig vehicleId={vehicleId} />
         </TabsContent>
         <TabsContent value="spare-parts">
           <SpareParts vehicleId={vehicleId} />

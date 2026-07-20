@@ -1,9 +1,11 @@
+import H2 from "@/components/H2";
 import type { Vehicle } from "@/features/garage/schemas/GetVehicles";
 import VehicleManual from "./VehicleManual";
 
 export default function Details({ vehicle }: { vehicle: Vehicle }) {
   return (
     <div className="flex flex-col gap-3">
+      <H2>Details</H2>
       <div className="flex flex-col gap-1">
         <p className="text-sm text-muted-foreground">Brand</p>
         <p>{vehicle.brand}</p>

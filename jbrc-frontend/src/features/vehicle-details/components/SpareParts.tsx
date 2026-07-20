@@ -1,4 +1,5 @@
 import DataTable from "@/components/data-table";
+import H2 from "@/components/H2";
 import AddPartsDialog from "@/features/inventory/components/AddPartsDialog";
 import DeletePartsDialog from "@/features/inventory/components/DeletePartsDialog";
 import PartDetailsSheet from "@/features/inventory/components/PartDetailsSheet";
@@ -83,6 +84,7 @@ export default function SpareParts({ vehicleId }: { vehicleId: string }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <H2>Spare Parts</H2>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <PartsSearchInput

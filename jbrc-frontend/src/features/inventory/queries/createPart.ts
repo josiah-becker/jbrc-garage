@@ -7,6 +7,8 @@ export type NewPart = {
   brand?: string | null;
   notes?: string | null;
   vehicle_ids?: string[];
+  consumable?: boolean;
+  installed_vehicle_id?: string | null;
 };
 
 export async function createParts(parts: NewPart[]) {

@@ -118,17 +118,37 @@ parts.post("/batch", async (c) => {
 parts.post("/:id", async (c) => {
   const id = c.req.param("id");
   const supabase = getSupabase(c.env);
-  const { part_number, name, category, notes, quantity, vehicle_ids } =
-    await c.req.json();
+  const {
+    part_number,
+    name,
+    category,
+    notes,
+    quantity,
+    vehicle_ids,
+    consumable,
+    installed_vehicle_id,
+  } = await c.req.json();
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("parts")
-    .update({ part_number, name, category, notes, quantity })
+    .update({
+      part_number,
+      name,
+      category,
+      notes,
+      quantity,
+      consumable,
+      // consumable parts can never be installed (db check constraint)
+      installed_vehicle_id: consumable === true ? null : installed_vehicle_id,
+    })
     .eq("id", id)
     .select()
     .single();
 
-  if (error) return c.json({ error: error.message }, 500);
+  if (error) {
+    const invalid = error.code === "23514" || error.code === "23503";
+    return c.json({ error: error.message }, invalid ? 400 : 500);
+  }
 
   if (Array.isArray(vehicle_ids)) {
     const { error: unlinkError } = await supabase
@@ -147,6 +167,40 @@ parts.post("/:id", async (c) => {
             part_id: id,
           })),
         );
+
+      if (linkError) return c.json({ error: linkError.message }, 500);
+    }
+
+    // removing the compatibility link for the installed vehicle also uninstalls
+    if (updated.installed_vehicle_id && !vehicle_ids.includes(updated.installed_vehicle_id)) {
+      const { error: uninstallError } = await supabase
+        .from("parts")
+        .update({ installed_vehicle_id: null })
+        .eq("id", id);
+
+      if (uninstallError) {
+        return c.json({ error: uninstallError.message }, 500);
+      }
+    }
+  }
+
+  // an installed part is implicitly compatible with its vehicle
+  if (typeof installed_vehicle_id === "string") {
+    const { data: link, error: linkLookupError } = await supabase
+      .from("vehicle_parts")
+      .select("part_id")
+      .eq("vehicle_id", installed_vehicle_id)
+      .eq("part_id", id)
+      .maybeSingle();
+
+    if (linkLookupError) {
+      return c.json({ error: linkLookupError.message }, 500);
+    }
+
+    if (!link) {
+      const { error: linkError } = await supabase
+        .from("vehicle_parts")
+        .insert({ vehicle_id: installed_vehicle_id, part_id: id });
 
       if (linkError) return c.json({ error: linkError.message }, 500);
     }

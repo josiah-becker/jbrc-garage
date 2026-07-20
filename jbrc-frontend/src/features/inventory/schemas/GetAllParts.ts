@@ -17,6 +17,8 @@ export const PartSchema = z.object({
   notes: z.string().nullable(),
   vehicles: z.array(z.object({ id: z.string(), name: z.string() })),
   quantity: PartQuantitySchema.nullable(),
+  consumable: z.boolean(),
+  installed_vehicle_id: z.string().nullable(),
 });
 
 export type Part = z.infer<typeof PartSchema>;
