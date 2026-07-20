@@ -22,7 +22,9 @@ export default function InstalledRigPart({ part }: { part: Part }) {
       <div className="flex items-center justify-between gap-2">
         <div className="flex flex-col">
           <p>{part.name}</p>
-          <p className="text-sm text-muted-foreground">{part.part_number}</p>
+          <p className="text-sm text-muted-foreground">
+            {part.brand} &middot; {part.part_number}
+          </p>
         </div>
         <Button
           variant="ghost"
