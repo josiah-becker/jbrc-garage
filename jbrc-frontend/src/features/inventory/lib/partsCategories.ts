@@ -10,8 +10,11 @@ export const DefaultPartsCategory = [
   "Chassis",
   "Wheels",
   "Tires",
-  "Suspension",
+  "Differentials",
+  "Shocks",
   "Body",
+  "Differential Oil",
+  "Shock Oil",
 ] as const;
 
 export type PartsCategory = (typeof DefaultPartsCategory)[number];

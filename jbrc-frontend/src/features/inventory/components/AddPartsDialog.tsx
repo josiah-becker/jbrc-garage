@@ -27,9 +27,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon, UploadIcon } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
 import { parseCsv } from "../lib/parseCsv";
+import {
+  DIFFERENTIAL_CATEGORY,
+  emptyOilForm,
+  OIL_CATEGORY,
+  resolveOilPartId,
+  type OilForm,
+} from "../lib/differentials";
 import { DefaultPartsCategory } from "../lib/partsCategories";
 import { GetAllPartsQuery } from "../queries/allPartsQuery";
 import { createParts, type NewPart } from "../queries/createPart";
+import DifferentialDetailsFields from "./DifferentialDetailsFields";
 
 const REQUIRED_CSV_COLUMNS = ["part_number", "name", "category"];
 
@@ -67,6 +75,19 @@ export default function AddPartsDialog({
   });
   const { data: parts = [] } = useQuery(GetAllPartsQuery);
 
+  const resolvedCategory =
+    form.category === CUSTOM_CATEGORY
+      ? form.custom_category.trim()
+      : form.category;
+  const isDifferential = resolvedCategory === DIFFERENTIAL_CATEGORY;
+  const oilOptions = parts.filter((part) => part.category === OIL_CATEGORY);
+  const defaultOilMode = oilOptions.length > 0 ? "existing" : "new";
+
+  const [sealed, setSealed] = useState(false);
+  const [oilMode, setOilMode] = useState<"existing" | "new">(defaultOilMode);
+  const [selectedOilId, setSelectedOilId] = useState<string | null>(null);
+  const [oilForm, setOilForm] = useState<OilForm>(emptyOilForm);
+
   const customCategories = Array.from(
     new Set(parts.map((part) => part.category)),
   )
@@ -92,6 +113,10 @@ export default function AddPartsDialog({
     setCsvFile(null);
     setCsvError(null);
     setMode("single");
+    setSealed(false);
+    setOilMode(defaultOilMode);
+    setSelectedOilId(null);
+    setOilForm(emptyOilForm);
     mutation.reset();
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -101,18 +126,23 @@ export default function AddPartsDialog({
     setCsvError(null);
 
     if (mode === "single") {
+      const details = isDifferential
+        ? {
+            sealed,
+            oil_part_id: await resolveOilPartId(oilMode, selectedOilId, oilForm),
+          }
+        : undefined;
+
       mutation.mutate([
         {
           part_number: form.part_number,
           name: form.name,
-          category:
-            form.category === CUSTOM_CATEGORY
-              ? form.custom_category.trim()
-              : form.category,
+          category: resolvedCategory,
           brand: form.brand || null,
           notes: form.notes || null,
           consumable: form.consumable,
           vehicle_ids: vehicleIds,
+          ...(details ? { details } : {}),
         },
       ]);
       return;
@@ -274,6 +304,20 @@ export default function AddPartsDialog({
                   }
                 />
               </div>
+              {isDifferential && (
+                <DifferentialDetailsFields
+                  idPrefix="add-parts-diff"
+                  parts={parts}
+                  sealed={sealed}
+                  onSealedChange={setSealed}
+                  oilMode={oilMode}
+                  onOilModeChange={setOilMode}
+                  selectedOilId={selectedOilId}
+                  onSelectedOilIdChange={setSelectedOilId}
+                  oilForm={oilForm}
+                  onOilFormChange={setOilForm}
+                />
+              )}
             </TabsContent>
             <TabsContent value="csv" className="flex flex-col gap-3 pt-2">
               <div className="flex flex-col gap-1.5">

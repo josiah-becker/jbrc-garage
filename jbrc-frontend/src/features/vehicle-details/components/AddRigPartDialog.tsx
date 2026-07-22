@@ -27,7 +27,15 @@ import type { Part } from "@/features/inventory/schemas/GetAllParts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { type FormEvent, useState } from "react";
+import {
+  DIFFERENTIAL_CATEGORY,
+  emptyOilForm,
+  OIL_CATEGORY,
+  resolveOilPartId,
+  type OilForm,
+} from "@/features/inventory/lib/differentials";
 import { installPart } from "../queries/installPart";
+import DifferentialDetailsFields from "@/features/inventory/components/DifferentialDetailsFields";
 
 const emptyForm = {
   part_number: "",
@@ -57,11 +65,19 @@ export default function AddRigPartDialog({
       !part.consumable,
   );
 
+  const isDifferential = category === DIFFERENTIAL_CATEGORY;
+  const oilOptions = parts.filter((part) => part.category === OIL_CATEGORY);
+  const defaultOilMode = oilOptions.length > 0 ? "existing" : "new";
+
   const defaultMode = candidates.length > 0 ? "existing" : "new";
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"existing" | "new">(defaultMode);
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [sealed, setSealed] = useState(false);
+  const [oilMode, setOilMode] = useState<"existing" | "new">(defaultOilMode);
+  const [selectedOilId, setSelectedOilId] = useState<string | null>(null);
+  const [oilForm, setOilForm] = useState<OilForm>(emptyOilForm);
   const idPrefix = category.toLowerCase().replace(/\s+/g, "-");
 
   const queryClient = useQueryClient();
@@ -73,8 +89,15 @@ export default function AddRigPartDialog({
   }
 
   const createMutation = useMutation({
-    mutationFn: () =>
-      createParts([
+    mutationFn: async () => {
+      const details = isDifferential
+        ? {
+            sealed,
+            oil_part_id: await resolveOilPartId(oilMode, selectedOilId, oilForm),
+          }
+        : undefined;
+
+      return createParts([
         {
           part_number: form.part_number,
           name: form.name,
@@ -84,8 +107,10 @@ export default function AddRigPartDialog({
           vehicle_ids: [vehicleId],
           consumable: false,
           installed_vehicle_id: vehicleId,
+          ...(details ? { details } : {}),
         },
-      ]),
+      ]);
+    },
     onSuccess: onInstalled,
   });
 
@@ -100,6 +125,10 @@ export default function AddRigPartDialog({
     setForm(emptyForm);
     setSelectedPartId(null);
     setMode(defaultMode);
+    setSealed(false);
+    setOilMode(defaultOilMode);
+    setSelectedOilId(null);
+    setOilForm(emptyOilForm);
     createMutation.reset();
     installMutation.reset();
   }
@@ -166,7 +195,19 @@ export default function AddRigPartDialog({
                       id={`${idPrefix}-existing-part`}
                       className="w-full"
                     >
-                      <SelectValue placeholder="Select a part" />
+                      <SelectValue placeholder="Select a part">
+                        {(value: string | null) => {
+                          const part = candidates.find((p) => p.id === value);
+                          if (!part) return "Select a part";
+                          const installedVehicle = vehicles.find(
+                            (vehicle) =>
+                              vehicle.id === part.installed_vehicle_id,
+                          );
+                          return installedVehicle
+                            ? `${part.name} (on ${installedVehicle.name})`
+                            : part.name;
+                        }}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {candidates.map((part) => {
@@ -228,6 +269,20 @@ export default function AddRigPartDialog({
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 />
               </div>
+              {isDifferential && (
+                <DifferentialDetailsFields
+                  idPrefix={`${idPrefix}-new`}
+                  parts={parts}
+                  sealed={sealed}
+                  onSealedChange={setSealed}
+                  oilMode={oilMode}
+                  onOilModeChange={setOilMode}
+                  selectedOilId={selectedOilId}
+                  onSelectedOilIdChange={setSelectedOilId}
+                  oilForm={oilForm}
+                  onOilFormChange={setOilForm}
+                />
+              )}
             </TabsContent>
           </Tabs>
           {(createMutation.isError || installMutation.isError) && (

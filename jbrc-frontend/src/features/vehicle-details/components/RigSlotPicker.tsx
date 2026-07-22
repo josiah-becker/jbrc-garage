@@ -4,6 +4,7 @@ import { GetAllPartsQuery } from "@/features/inventory/queries/allPartsQuery";
 import type { Part } from "@/features/inventory/schemas/GetAllParts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { XIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { installPart } from "../queries/installPart";
 import AddRigPartDialog from "./AddRigPartDialog";
 
@@ -17,11 +18,15 @@ export default function RigSlotPicker({
   vehicleId,
   parts,
   vehicles,
+  renderPartExtra,
+  renderPartSubtext,
 }: {
   category: string;
   vehicleId: string;
   parts: Part[];
   vehicles: Vehicles;
+  renderPartExtra?: (part: Part) => ReactNode;
+  renderPartSubtext?: (part: Part) => ReactNode;
 }) {
   const installed = parts.filter(
     (part) =>
@@ -68,16 +73,20 @@ export default function RigSlotPicker({
                 {details && (
                   <p className="text-sm text-muted-foreground">{details}</p>
                 )}
+                {renderPartSubtext?.(part)}
               </div>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Remove ${part.name}`}
-                disabled={pending}
-                onClick={() => removeMutation.mutate(part.id)}
-              >
-                <XIcon />
-              </Button>
+              <div className="flex items-center gap-1">
+                {renderPartExtra?.(part)}
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Remove ${part.name}`}
+                  disabled={pending}
+                  onClick={() => removeMutation.mutate(part.id)}
+                >
+                  <XIcon />
+                </Button>
+              </div>
             </div>
           );
         })

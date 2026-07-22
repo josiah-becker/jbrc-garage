@@ -7,7 +7,7 @@ import EscCard from "./EscCard";
 import MotorCard from "./MotorCard";
 import ReceiverCard from "./ReceiverCard";
 import ServoCard from "./ServoCard";
-import ShocksCard from "./ShocksCard";
+import SuspensionCard from "./ShocksCard";
 
 export default function MyRig({ vehicleId }: { vehicleId: string }) {
   const { data: parts } = useSuspenseQuery(GetAllPartsQuery);
@@ -31,7 +31,11 @@ export default function MyRig({ vehicleId }: { vehicleId: string }) {
           parts={parts}
           vehicles={vehicles}
         />
-        <ShocksCard vehicleId={vehicleId} parts={parts} vehicles={vehicles} />
+        <SuspensionCard
+          vehicleId={vehicleId}
+          parts={parts}
+          vehicles={vehicles}
+        />
       </div>
     </div>
   );

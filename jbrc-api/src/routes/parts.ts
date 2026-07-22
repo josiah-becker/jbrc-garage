@@ -128,6 +128,7 @@ parts.post("/:id", async (c) => {
     vehicle_ids,
     consumable,
     installed_vehicle_id,
+    details,
   } = await c.req.json();
 
   const { data: updated, error } = await supabase
@@ -140,6 +141,7 @@ parts.post("/:id", async (c) => {
       notes,
       quantity,
       consumable,
+      details,
       // consumable parts can never be installed (db check constraint)
       installed_vehicle_id: consumable === true ? null : installed_vehicle_id,
     })
