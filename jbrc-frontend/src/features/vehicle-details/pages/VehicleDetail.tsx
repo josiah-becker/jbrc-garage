@@ -1,11 +1,11 @@
 import H1 from "@/components/H1";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import VehicleSessionsTab from "@/features/sessions/components/VehicleSessionsTab";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import DeleteVehicleDialog from "../../garage/components/DeleteVehicleDialog";
 import EditVehicleDialog from "../../garage/components/EditVehicleDialog";
-import VehicleSessionsTab from "@/features/sessions/components/VehicleSessionsTab";
 import Details from "../components/Details";
 import Media from "../components/Media";
 import MyRig from "../components/MyRig";
@@ -42,7 +42,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
       </div>
 
       <Tabs>
-        <TabsList variant="line" className="w-full max-w-md">
+        <TabsList variant="line" className="w-full max-w-full overflow-auto">
           <TabsTrigger value="my-rig">My Rig</TabsTrigger>
           <TabsTrigger value="spare-parts">Spare Parts</TabsTrigger>
           <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
