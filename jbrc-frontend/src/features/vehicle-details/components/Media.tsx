@@ -7,19 +7,22 @@ import {
 } from "@/components/ui/tooltip";
 import type { Vehicle } from "@/features/garage/schemas/GetVehicles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon, Upload } from "lucide-react";
-import { useRef, type ChangeEvent } from "react";
+import { Upload } from "lucide-react";
+import { useState, useRef, type ChangeEvent } from "react";
 import { GetVehicleMediaQuery } from "../queries/GetVehicleMedia";
 import {
   deleteVehicleMedia,
   uploadVehicleMedia,
+  type MediaUploadItem,
 } from "../queries/uploadVehicleMedia";
+import MediaUploadDialog from "./MediaUploadDialog";
 import VehicleMediaGallery from "./VehicleMediaGallery";
 import VehicleThumbnail from "./VehicleThumbnail";
 
 export default function Media({ vehicle }: { vehicle: Vehicle }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   const mediaQuery = GetVehicleMediaQuery(vehicle.id);
 
@@ -27,8 +30,12 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
     queryClient.invalidateQueries({ queryKey: mediaQuery.queryKey });
 
   const uploadMutation = useMutation({
-    mutationFn: (files: File[]) => uploadVehicleMedia(vehicle.id, files),
-    onSuccess: invalidate,
+    mutationFn: (items: MediaUploadItem[]) =>
+      uploadVehicleMedia(vehicle.id, items),
+    onSuccess: () => {
+      invalidate();
+      setPendingFiles([]);
+    },
   });
 
   const removeMutation = useMutation({
@@ -39,8 +46,17 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
-    if (files.length > 0) uploadMutation.mutate(files);
+    if (files.length > 0) {
+      uploadMutation.reset();
+      setPendingFiles(files);
+    }
   }
+
+  function handleCancelUpload() {
+    uploadMutation.reset();
+    setPendingFiles([]);
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <H2>Thumbnail</H2>
@@ -65,26 +81,31 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
                   disabled={uploadMutation.isPending}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {uploadMutation.isPending ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
-                  )}
+                  <Upload className="h-4 w-4" />
                 </Button>
               }
             />
             <TooltipContent>Upload photos or videos</TooltipContent>
           </Tooltip>
-          {(uploadMutation.isError || removeMutation.isError) && (
+          {removeMutation.isError && (
             <p className="text-sm text-destructive">
-              {uploadMutation.isError
-                ? `Failed to upload media. Please try again. ${(uploadMutation.error as Error).message}`
-                : "Failed to remove media. Please try again."}
+              Failed to remove media. Please try again.
             </p>
           )}
         </div>
       </div>
       <VehicleMediaGallery vehicleId={vehicle.id} />
+      <MediaUploadDialog
+        files={pendingFiles}
+        isUploading={uploadMutation.isPending}
+        error={
+          uploadMutation.isError
+            ? `Failed to upload media. Please try again. ${(uploadMutation.error as Error).message}`
+            : null
+        }
+        onCancel={handleCancelUpload}
+        onUpload={(items) => uploadMutation.mutate(items)}
+      />
     </div>
   );
 }

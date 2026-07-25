@@ -1,8 +1,19 @@
 import { apiFetch } from "@/lib/api";
 
-export async function uploadVehicleMedia(vehicleId: string, files: File[]) {
+export type MediaUploadItem = {
+  file: File;
+  caption?: string;
+};
+
+export async function uploadVehicleMedia(
+  vehicleId: string,
+  items: MediaUploadItem[],
+) {
   const formData = new FormData();
-  for (const file of files) formData.append("file", file);
+  for (const { file, caption } of items) {
+    formData.append("file", file);
+    formData.append("caption", caption ?? "");
+  }
 
   const res = await apiFetch(`/vehicles/${vehicleId}/media`, {
     method: "POST",

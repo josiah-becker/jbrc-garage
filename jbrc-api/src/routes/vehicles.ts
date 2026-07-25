@@ -164,6 +164,9 @@ vehicles.post("/:id/media", async (c) => {
   const files = (Array.isArray(body.file) ? body.file : [body.file]).filter(
     (value): value is File => value instanceof File,
   );
+  const captions = (
+    Array.isArray(body.caption) ? body.caption : [body.caption]
+  ).filter((value): value is string => typeof value === "string");
 
   if (files.length === 0) {
     return c.json({ error: "Expected one or more 'file' fields" }, 400);
@@ -186,12 +189,16 @@ vehicles.post("/:id/media", async (c) => {
     }
   }
 
-  const rows = files.map((file) => ({
-    id: crypto.randomUUID(),
-    vehicle_id: id,
-    content_type: file.type,
-    size_bytes: file.size,
-  }));
+  const rows = files.map((file, i) => {
+    const caption = captions[i]?.trim();
+    return {
+      id: crypto.randomUUID(),
+      vehicle_id: id,
+      content_type: file.type,
+      size_bytes: file.size,
+      caption: caption ? caption : null,
+    };
+  });
 
   await Promise.all(
     files.map((file, i) =>
