@@ -1,4 +1,5 @@
 import H1 from "@/components/H1";
+import H2 from "@/components/H2";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
@@ -6,6 +7,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import DeleteSessionDialog from "../components/DeleteSessionDialog";
 import EditSessionDialog from "../components/EditSessionDialog";
 import SessionMedia from "../components/SessionMedia";
+import SessionThumbnail from "../components/SessionThumbnail";
 import { GetSessionQuery } from "../queries/GetSession";
 
 export default function SessionDetail({ sessionId }: { sessionId: string }) {
@@ -39,6 +41,11 @@ export default function SessionDetail({ sessionId }: { sessionId: string }) {
             onDeleted={() => navigate({ to: "/sessions" })}
           />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <H2>Thumbnail</H2>
+        <SessionThumbnail session={session} />
       </div>
 
       <div className="flex flex-col gap-2">

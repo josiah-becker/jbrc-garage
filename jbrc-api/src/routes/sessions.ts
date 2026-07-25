@@ -140,6 +140,53 @@ sessions.delete("/:id", async (c) => {
   return c.json(data);
 });
 
+sessions.post("/:id/thumbnail", async (c) => {
+  const id = c.req.param("id");
+  const supabase = getSupabase(c.env);
+
+  const { error: sessionError } = await supabase
+    .from("sessions")
+    .select("id")
+    .eq("id", id)
+    .single();
+
+  if (sessionError) return c.json({ error: "Session not found" }, 404);
+
+  const body = await c.req.parseBody();
+  const file = body.file;
+
+  if (!(file instanceof File)) {
+    return c.json({ error: "Expected a 'file' field with an image" }, 400);
+  }
+
+  if (!file.type.startsWith("image/")) {
+    return c.json({ error: "File must be an image" }, 400);
+  }
+
+  if (file.size > MAX_PHOTO_BYTES) {
+    return c.json({ error: "Image must be 15MB or smaller" }, 400);
+  }
+
+  const object = await c.env.MEDIA_BUCKET.put(
+    `sessions/${id}/thumbnail`,
+    file,
+    {
+      httpMetadata: { contentType: file.type },
+    },
+  );
+
+  return c.json(
+    { key: object.key, size: object.size, etag: object.httpEtag },
+    201,
+  );
+});
+
+sessions.delete("/:id/thumbnail", async (c) => {
+  const id = c.req.param("id");
+  await c.env.MEDIA_BUCKET.delete(`sessions/${id}/thumbnail`);
+  return c.body(null, 204);
+});
+
 sessions.get("/:id/media", async (c) => {
   const id = c.req.param("id");
   const supabase = getSupabase(c.env);

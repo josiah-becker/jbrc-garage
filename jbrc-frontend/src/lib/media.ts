@@ -11,3 +11,7 @@ export function getVehicleMediaUrl(vehicleId: string, mediaId: string) {
 export function getSessionMediaUrl(sessionId: string, mediaId: string) {
   return `${mediaBase}/sessions/${sessionId}/media/${mediaId}`;
 }
+
+export function getSessionThumbnailUrl(sessionId: string) {
+  return `${mediaBase}/sessions/${sessionId}/thumbnail`;
+}

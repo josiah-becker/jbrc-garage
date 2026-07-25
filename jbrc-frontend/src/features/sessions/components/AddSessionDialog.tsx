@@ -26,10 +26,14 @@ const emptyForm = {
   notes: "",
 };
 
-export default function AddSessionDialog() {
+export default function AddSessionDialog({
+  defaultVehicleIds = [],
+}: {
+  defaultVehicleIds?: string[];
+}) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
-  const [vehicleIds, setVehicleIds] = useState<string[]>([]);
+  const [vehicleIds, setVehicleIds] = useState<string[]>(defaultVehicleIds);
 
   const queryClient = useQueryClient();
 
@@ -51,7 +55,7 @@ export default function AddSessionDialog() {
 
   function resetForm() {
     setForm(emptyForm);
-    setVehicleIds([]);
+    setVehicleIds(defaultVehicleIds);
     mutation.reset();
   }
 

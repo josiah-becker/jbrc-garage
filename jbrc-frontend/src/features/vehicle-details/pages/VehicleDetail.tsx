@@ -42,7 +42,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
       </div>
 
       <Tabs>
-        <TabsList variant="line" className="w-full max-w-full overflow-auto">
+        <TabsList variant="line" className="w-full max-w-full overflow-x-auto">
           <TabsTrigger value="my-rig">My Rig</TabsTrigger>
           <TabsTrigger value="spare-parts">Spare Parts</TabsTrigger>
           <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
