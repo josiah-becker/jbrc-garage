@@ -14,7 +14,9 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMaintenanceRouteRouteImport } from './routes/_app/maintenance/route'
 import { Route as AppInventoryRouteRouteImport } from './routes/_app/inventory/route'
+import { Route as AppSessionsIndexRouteImport } from './routes/_app/sessions/index'
 import { Route as AppVehiclesVehicleIdRouteImport } from './routes/_app/vehicles/$vehicleId'
+import { Route as AppSessionsSessionIdRouteImport } from './routes/_app/sessions/$sessionId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -40,9 +42,19 @@ const AppInventoryRouteRoute = AppInventoryRouteRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSessionsIndexRoute = AppSessionsIndexRouteImport.update({
+  id: '/sessions/',
+  path: '/sessions/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppVehiclesVehicleIdRoute = AppVehiclesVehicleIdRouteImport.update({
   id: '/vehicles/$vehicleId',
   path: '/vehicles/$vehicleId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSessionsSessionIdRoute = AppSessionsSessionIdRouteImport.update({
+  id: '/sessions/$sessionId',
+  path: '/sessions/$sessionId',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -51,14 +63,18 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/inventory': typeof AppInventoryRouteRoute
   '/maintenance': typeof AppMaintenanceRouteRoute
+  '/sessions/$sessionId': typeof AppSessionsSessionIdRoute
   '/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/sessions/': typeof AppSessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/inventory': typeof AppInventoryRouteRoute
   '/maintenance': typeof AppMaintenanceRouteRoute
   '/': typeof AppIndexRoute
+  '/sessions/$sessionId': typeof AppSessionsSessionIdRoute
   '/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/sessions': typeof AppSessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,14 +83,29 @@ export interface FileRoutesById {
   '/_app/inventory': typeof AppInventoryRouteRoute
   '/_app/maintenance': typeof AppMaintenanceRouteRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/sessions/$sessionId': typeof AppSessionsSessionIdRoute
   '/_app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/_app/sessions/': typeof AppSessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/inventory' | '/maintenance' | '/vehicles/$vehicleId'
+    | '/'
+    | '/login'
+    | '/inventory'
+    | '/maintenance'
+    | '/sessions/$sessionId'
+    | '/vehicles/$vehicleId'
+    | '/sessions/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/inventory' | '/maintenance' | '/' | '/vehicles/$vehicleId'
+  to:
+    | '/login'
+    | '/inventory'
+    | '/maintenance'
+    | '/'
+    | '/sessions/$sessionId'
+    | '/vehicles/$vehicleId'
+    | '/sessions'
   id:
     | '__root__'
     | '/_app'
@@ -82,7 +113,9 @@ export interface FileRouteTypes {
     | '/_app/inventory'
     | '/_app/maintenance'
     | '/_app/'
+    | '/_app/sessions/$sessionId'
     | '/_app/vehicles/$vehicleId'
+    | '/_app/sessions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -127,11 +160,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInventoryRouteRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/sessions/': {
+      id: '/_app/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions/'
+      preLoaderRoute: typeof AppSessionsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/vehicles/$vehicleId': {
       id: '/_app/vehicles/$vehicleId'
       path: '/vehicles/$vehicleId'
       fullPath: '/vehicles/$vehicleId'
       preLoaderRoute: typeof AppVehiclesVehicleIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sessions/$sessionId': {
+      id: '/_app/sessions/$sessionId'
+      path: '/sessions/$sessionId'
+      fullPath: '/sessions/$sessionId'
+      preLoaderRoute: typeof AppSessionsSessionIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -141,14 +188,18 @@ interface AppRouteChildren {
   AppInventoryRouteRoute: typeof AppInventoryRouteRoute
   AppMaintenanceRouteRoute: typeof AppMaintenanceRouteRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppSessionsSessionIdRoute: typeof AppSessionsSessionIdRoute
   AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
+  AppSessionsIndexRoute: typeof AppSessionsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppInventoryRouteRoute: AppInventoryRouteRoute,
   AppMaintenanceRouteRoute: AppMaintenanceRouteRoute,
   AppIndexRoute: AppIndexRoute,
+  AppSessionsSessionIdRoute: AppSessionsSessionIdRoute,
   AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
+  AppSessionsIndexRoute: AppSessionsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

@@ -4,6 +4,7 @@ import type { SupabaseBindings } from "./lib/supabase";
 import { requireAuth } from "./middleware/auth";
 import { vehicles } from "./routes/vehicles";
 import { parts } from "./routes/parts";
+import { sessions } from "./routes/sessions";
 
 const app = new Hono<{ Bindings: SupabaseBindings }>();
 
@@ -18,5 +19,6 @@ app.use("*", requireAuth);
 
 app.route("/vehicles", vehicles);
 app.route("/parts", parts);
+app.route("/sessions", sessions);
 
 export default app;

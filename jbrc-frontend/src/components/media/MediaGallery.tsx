@@ -5,14 +5,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getVehicleMediaUrl } from "@/lib/media";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon, PlayIcon, XIcon } from "lucide-react";
 import { useState } from "react";
-import { GetVehicleMediaQuery } from "../queries/GetVehicleMedia";
-import type { VehicleMediaList } from "../schemas/GetVehicleMedia";
-import { deleteVehicleMedia } from "../queries/uploadVehicleMedia";
 import MediaLightbox from "./MediaLightbox";
+import type { MediaItem } from "./types";
 
 function isSameDay(a: Date, b: Date) {
   return (
@@ -36,11 +32,11 @@ function getDayLabel(date: Date) {
   });
 }
 
-function groupByDay(items: VehicleMediaList) {
+function groupByDay(items: MediaItem[]) {
   const groups: {
     key: string;
     label: string;
-    items: { item: VehicleMediaList[number]; index: number }[];
+    items: { item: MediaItem; index: number }[];
   }[] = [];
   const groupIndexByKey = new Map<string, number>();
 
@@ -59,34 +55,30 @@ function groupByDay(items: VehicleMediaList) {
   return groups;
 }
 
-export default function VehicleMediaGallery({
-  vehicleId,
+export default function MediaGallery({
+  media,
+  isPending,
+  isError,
+  getUrl,
+  onRemove,
+  isRemoving,
+  emptyLabel = "No media yet.",
 }: {
-  vehicleId: string;
+  media: MediaItem[] | undefined;
+  isPending: boolean;
+  isError: boolean;
+  getUrl: (mediaId: string) => string;
+  onRemove: (mediaId: string) => void;
+  isRemoving: (mediaId: string) => boolean;
+  emptyLabel?: string;
 }) {
-  const queryClient = useQueryClient();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  const mediaQuery = GetVehicleMediaQuery(vehicleId);
-  const { data: media, isPending, isError } = useQuery(mediaQuery);
-
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: mediaQuery.queryKey });
-
-  const removeMutation = useMutation({
-    mutationFn: (mediaId: string) => deleteVehicleMedia(vehicleId, mediaId),
-    onSuccess: invalidate,
-  });
 
   if (isPending) return <Skeleton className="w-full h-32" />;
   if (isError)
     return <p className="text-sm text-destructive">Failed to load media.</p>;
 
-  const galleryMedia = media.filter(
-    (item) => item.content_type !== "application/pdf",
-  );
-
-  const sortedMedia = [...galleryMedia].sort(
+  const sortedMedia = [...(media ?? [])].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   );
 
@@ -95,9 +87,7 @@ export default function VehicleMediaGallery({
   return (
     <div className="flex flex-col gap-3">
       {sortedMedia.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No media for this vehicle yet.
-        </p>
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
       ) : (
         <div className="flex flex-col gap-5">
           {groups.map((group) => (
@@ -107,11 +97,9 @@ export default function VehicleMediaGallery({
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
                 {group.items.map(({ item, index }) => {
-                  const url = getVehicleMediaUrl(vehicleId, item.id);
+                  const url = getUrl(item.id);
                   const isVideo = item.content_type.startsWith("video/");
-                  const isRemoving =
-                    removeMutation.isPending &&
-                    removeMutation.variables === item.id;
+                  const removing = isRemoving(item.id);
                   return (
                     <div key={item.id} className="relative">
                       <button
@@ -156,10 +144,10 @@ export default function VehicleMediaGallery({
                                 type="button"
                                 variant="destructive"
                                 size="icon-sm"
-                                disabled={removeMutation.isPending}
-                                onClick={() => removeMutation.mutate(item.id)}
+                                disabled={removing}
+                                onClick={() => onRemove(item.id)}
                               >
-                                {isRemoving ? (
+                                {removing ? (
                                   <Loader2Icon className="h-4 w-4 animate-spin" />
                                 ) : (
                                   <XIcon />
@@ -179,8 +167,8 @@ export default function VehicleMediaGallery({
         </div>
       )}
       <MediaLightbox
-        vehicleId={vehicleId}
         media={sortedMedia}
+        getUrl={getUrl}
         index={activeIndex}
         onIndexChange={setActiveIndex}
       />

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { formatBytes } from "@/lib/utils";
 import { FileVideoIcon, Loader2Icon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { MediaUploadItem } from "../queries/uploadVehicleMedia";
+import type { MediaUploadItem } from "./types";
 
 type PendingItem = {
   file: File;

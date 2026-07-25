@@ -1,8 +1,8 @@
 import { apiFetch } from "@/lib/api";
 import type { MediaUploadItem } from "@/components/media/types";
 
-export async function uploadVehicleMedia(
-  vehicleId: string,
+export async function uploadSessionMedia(
+  sessionId: string,
   items: MediaUploadItem[],
 ) {
   const formData = new FormData();
@@ -11,7 +11,7 @@ export async function uploadVehicleMedia(
     formData.append("caption", caption ?? "");
   }
 
-  const res = await apiFetch(`/vehicles/${vehicleId}/media`, {
+  const res = await apiFetch(`/sessions/${sessionId}/media`, {
     method: "POST",
     body: formData,
   });
@@ -19,8 +19,8 @@ export async function uploadVehicleMedia(
   return res.json();
 }
 
-export async function deleteVehicleMedia(vehicleId: string, mediaId: string) {
-  const res = await apiFetch(`/vehicles/${vehicleId}/media/${mediaId}`, {
+export async function deleteSessionMedia(sessionId: string, mediaId: string) {
+  const res = await apiFetch(`/sessions/${sessionId}/media/${mediaId}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to remove media");

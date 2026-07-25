@@ -8,21 +8,22 @@ import {
 import MediaGallery from "@/components/media/MediaGallery";
 import MediaUploadDialog from "@/components/media/MediaUploadDialog";
 import type { MediaUploadItem } from "@/components/media/types";
-import type { Vehicle } from "@/features/garage/schemas/GetVehicles";
-import { getVehicleMediaUrl } from "@/lib/media";
+import { getSessionMediaUrl } from "@/lib/media";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
-import { GetVehicleMediaQuery } from "../queries/GetVehicleMedia";
-import { deleteVehicleMedia, uploadVehicleMedia } from "../queries/uploadVehicleMedia";
-import VehicleThumbnail from "./VehicleThumbnail";
+import { GetSessionMediaQuery } from "../queries/GetSessionMedia";
+import {
+  deleteSessionMedia,
+  uploadSessionMedia,
+} from "../queries/uploadSessionMedia";
 
-export default function Media({ vehicle }: { vehicle: Vehicle }) {
+export default function SessionMedia({ sessionId }: { sessionId: string }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
-  const mediaQuery = GetVehicleMediaQuery(vehicle.id);
+  const mediaQuery = GetSessionMediaQuery(sessionId);
   const { data: media, isPending, isError } = useQuery(mediaQuery);
 
   const invalidate = () =>
@@ -30,7 +31,7 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
 
   const uploadMutation = useMutation({
     mutationFn: (items: MediaUploadItem[]) =>
-      uploadVehicleMedia(vehicle.id, items),
+      uploadSessionMedia(sessionId, items),
     onSuccess: () => {
       invalidate();
       setPendingFiles([]);
@@ -38,7 +39,7 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (mediaId: string) => deleteVehicleMedia(vehicle.id, mediaId),
+    mutationFn: (mediaId: string) => deleteSessionMedia(sessionId, mediaId),
     onSuccess: invalidate,
   });
 
@@ -58,8 +59,6 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <H2>Thumbnail</H2>
-      <VehicleThumbnail vehicle={vehicle} />
       <div className="flex gap-2">
         <H2>Media</H2>
         <div className="flex items-center gap-2">
@@ -97,12 +96,12 @@ export default function Media({ vehicle }: { vehicle: Vehicle }) {
         media={media}
         isPending={isPending}
         isError={isError}
-        getUrl={(mediaId) => getVehicleMediaUrl(vehicle.id, mediaId)}
+        getUrl={(mediaId) => getSessionMediaUrl(sessionId, mediaId)}
         onRemove={(mediaId) => removeMutation.mutate(mediaId)}
         isRemoving={(mediaId) =>
           removeMutation.isPending && removeMutation.variables === mediaId
         }
-        emptyLabel="No media for this vehicle yet."
+        emptyLabel="No media for this session yet."
       />
       <MediaUploadDialog
         files={pendingFiles}

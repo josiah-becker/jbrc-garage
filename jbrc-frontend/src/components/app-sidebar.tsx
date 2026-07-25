@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/sidebar";
 import { supabase } from "@/lib/supabase";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Archive, LogOut, Warehouse, Wrench } from "lucide-react";
+import { Archive, Compass, LogOut, Warehouse, Wrench } from "lucide-react";
 
 const items = [
   { title: "Garage", url: "/", icon: Warehouse },
   { title: "Inventory", url: "/inventory", icon: Archive },
+  { title: "Sessions", url: "/sessions", icon: Compass },
   { title: "Maintenance", url: "/maintenance", icon: Wrench },
 ];
 

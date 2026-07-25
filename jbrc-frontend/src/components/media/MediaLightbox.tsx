@@ -1,20 +1,19 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getVehicleMediaUrl } from "@/lib/media";
 import { formatBytes } from "@/lib/utils";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 import { useRef, type KeyboardEvent, type TouchEvent } from "react";
-import type { VehicleMediaList } from "../schemas/GetVehicleMedia";
+import type { MediaItem } from "./types";
 
 export default function MediaLightbox({
-  vehicleId,
   media,
+  getUrl,
   index,
   onIndexChange,
 }: {
-  vehicleId: string;
-  media: VehicleMediaList;
+  media: MediaItem[];
+  getUrl: (mediaId: string) => string;
   index: number | null;
   onIndexChange: (index: number | null) => void;
 }) {
@@ -112,7 +111,7 @@ export default function MediaLightbox({
                 {current.content_type.startsWith("video/") ? (
                   <video
                     key={current.id}
-                    src={getVehicleMediaUrl(vehicleId, current.id)}
+                    src={getUrl(current.id)}
                     controls
                     autoPlay
                     playsInline
@@ -121,7 +120,7 @@ export default function MediaLightbox({
                 ) : (
                   <img
                     key={current.id}
-                    src={getVehicleMediaUrl(vehicleId, current.id)}
+                    src={getUrl(current.id)}
                     alt={current.caption ?? ""}
                     className="max-h-full max-w-full rounded-lg object-contain"
                   />

@@ -7,3 +7,7 @@ export function getVehicleThumbnailUrl(vehicleId: string) {
 export function getVehicleMediaUrl(vehicleId: string, mediaId: string) {
   return `${mediaBase}/vehicles/${vehicleId}/media/${mediaId}`;
 }
+
+export function getSessionMediaUrl(sessionId: string, mediaId: string) {
+  return `${mediaBase}/sessions/${sessionId}/media/${mediaId}`;
+}

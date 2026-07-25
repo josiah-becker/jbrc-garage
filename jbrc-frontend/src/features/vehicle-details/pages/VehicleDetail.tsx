@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import DeleteVehicleDialog from "../../garage/components/DeleteVehicleDialog";
 import EditVehicleDialog from "../../garage/components/EditVehicleDialog";
+import VehicleSessionsTab from "@/features/sessions/components/VehicleSessionsTab";
 import Details from "../components/Details";
 import Media from "../components/Media";
 import MyRig from "../components/MyRig";
@@ -45,6 +46,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
           <TabsTrigger value="my-rig">My Rig</TabsTrigger>
           <TabsTrigger value="spare-parts">Spare Parts</TabsTrigger>
           <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="media">Media</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
         </TabsList>
@@ -56,6 +58,9 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
         </TabsContent>
         <TabsContent value="maintenance">
           <p>Maintenance content goes here.</p>
+        </TabsContent>
+        <TabsContent value="sessions" className="flex flex-col gap-3">
+          <VehicleSessionsTab vehicleId={vehicleId} />
         </TabsContent>
         <TabsContent value="media" className="flex flex-col gap-3">
           <Media vehicle={vehicle} />
